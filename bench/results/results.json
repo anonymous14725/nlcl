@@ -1,0 +1,484 @@
+{
+ "date": "2026-11-17 15:57",
+ "systems": {
+  "nlcl-untrained": {
+   "sentences": 117,
+   "interpretation_accuracy": 0.4476,
+   "executed": 95,
+   "precision_when_executed": 0.4947,
+   "silent_error_rate": 0.4103,
+   "asked": 22,
+   "nonsense_caught": "1/12",
+   "median_ms": 0.87,
+   "calibration_ece": 0.3816,
+   "calibration_brier": 0.3414,
+   "calibration_auroc": 0.8966,
+   "paraphrase_consistency": 0.0571
+  },
+  "nlcl-trained": {
+   "sentences": 117,
+   "interpretation_accuracy": 0.4667,
+   "executed": 77,
+   "precision_when_executed": 0.6364,
+   "silent_error_rate": 0.2393,
+   "asked": 40,
+   "nonsense_caught": "9/12",
+   "median_ms": 0.8,
+   "calibration_ece": 0.1926,
+   "calibration_brier": 0.1658,
+   "calibration_auroc": 0.9146,
+   "paraphrase_consistency": 0.0857,
+   "rules_learned": 3
+  }
+ },
+ "learning_curve": [
+  {
+   "sentences": 117,
+   "interpretation_accuracy": 0.4476,
+   "executed": 95,
+   "precision_when_executed": 0.4947,
+   "silent_error_rate": 0.4103,
+   "asked": 22,
+   "nonsense_caught": "1/12",
+   "median_ms": 0.62,
+   "calibration_ece": 0.3816,
+   "calibration_brier": 0.3414,
+   "calibration_auroc": 0.8966,
+   "paraphrases_per_intent": 0,
+   "rules_learned": 0
+  },
+  {
+   "sentences": 117,
+   "interpretation_accuracy": 0.4476,
+   "executed": 76,
+   "precision_when_executed": 0.6184,
+   "silent_error_rate": 0.2479,
+   "asked": 41,
+   "nonsense_caught": "9/12",
+   "median_ms": 0.89,
+   "calibration_ece": 0.2654,
+   "calibration_brier": 0.2147,
+   "calibration_auroc": 0.881,
+   "paraphrases_per_intent": 1,
+   "rules_learned": 1
+  },
+  {
+   "sentences": 117,
+   "interpretation_accuracy": 0.4476,
+   "executed": 76,
+   "precision_when_executed": 0.6184,
+   "silent_error_rate": 0.2479,
+   "asked": 41,
+   "nonsense_caught": "9/12",
+   "median_ms": 0.75,
+   "calibration_ece": 0.2358,
+   "calibration_brier": 0.1884,
+   "calibration_auroc": 0.9061,
+   "paraphrases_per_intent": 2,
+   "rules_learned": 1
+  },
+  {
+   "sentences": 117,
+   "interpretation_accuracy": 0.4667,
+   "executed": 77,
+   "precision_when_executed": 0.6364,
+   "silent_error_rate": 0.2393,
+   "asked": 40,
+   "nonsense_caught": "9/12",
+   "median_ms": 0.84,
+   "calibration_ece": 0.1926,
+   "calibration_brier": 0.1658,
+   "calibration_auroc": 0.9146,
+   "paraphrases_per_intent": 3,
+   "rules_learned": 3
+  },
+  {
+   "sentences": 117,
+   "interpretation_accuracy": 0.4667,
+   "executed": 77,
+   "precision_when_executed": 0.6364,
+   "silent_error_rate": 0.2393,
+   "asked": 40,
+   "nonsense_caught": "9/12",
+   "median_ms": 0.88,
+   "calibration_ece": 0.1926,
+   "calibration_brier": 0.1658,
+   "calibration_auroc": 0.9146,
+   "paraphrases_per_intent": 4,
+   "rules_learned": 3
+  },
+  {
+   "sentences": 117,
+   "interpretation_accuracy": 0.4667,
+   "executed": 77,
+   "precision_when_executed": 0.6364,
+   "silent_error_rate": 0.2393,
+   "asked": 40,
+   "nonsense_caught": "9/12",
+   "median_ms": 0.97,
+   "calibration_ece": 0.1926,
+   "calibration_brier": 0.1658,
+   "calibration_auroc": 0.9146,
+   "paraphrases_per_intent": 5,
+   "rules_learned": 3
+  },
+  {
+   "sentences": 117,
+   "interpretation_accuracy": 0.4667,
+   "executed": 77,
+   "precision_when_executed": 0.6364,
+   "silent_error_rate": 0.2393,
+   "asked": 40,
+   "nonsense_caught": "9/12",
+   "median_ms": 0.79,
+   "calibration_ece": 0.1926,
+   "calibration_brier": 0.1658,
+   "calibration_auroc": 0.9146,
+   "paraphrases_per_intent": 6,
+   "rules_learned": 3
+  },
+  {
+   "sentences": 117,
+   "interpretation_accuracy": 0.4667,
+   "executed": 77,
+   "precision_when_executed": 0.6364,
+   "silent_error_rate": 0.2393,
+   "asked": 40,
+   "nonsense_caught": "9/12",
+   "median_ms": 0.78,
+   "calibration_ece": 0.1926,
+   "calibration_brier": 0.1658,
+   "calibration_auroc": 0.9146,
+   "paraphrases_per_intent": 7,
+   "rules_learned": 3
+  },
+  {
+   "sentences": 117,
+   "interpretation_accuracy": 0.4667,
+   "executed": 77,
+   "precision_when_executed": 0.6364,
+   "silent_error_rate": 0.2393,
+   "asked": 40,
+   "nonsense_caught": "9/12",
+   "median_ms": 0.81,
+   "calibration_ece": 0.1926,
+   "calibration_brier": 0.1658,
+   "calibration_auroc": 0.9146,
+   "paraphrases_per_intent": 8,
+   "rules_learned": 3
+  },
+  {
+   "sentences": 117,
+   "interpretation_accuracy": 0.4667,
+   "executed": 77,
+   "precision_when_executed": 0.6364,
+   "silent_error_rate": 0.2393,
+   "asked": 40,
+   "nonsense_caught": "9/12",
+   "median_ms": 0.81,
+   "calibration_ece": 0.1926,
+   "calibration_brier": 0.1658,
+   "calibration_auroc": 0.9146,
+   "paraphrases_per_intent": 9,
+   "rules_learned": 3
+  }
+ ],
+ "notes": [
+  "llm-direct and nlcl+teacher were NOT run: no language-model backend (set a free API key, see ':backend status', then run again)."
+ ],
+ "learned_kb": "% NLCL learned knowledge - written 2026-11-17 15:57:33\n% (plain Prolog facts: edit, delete or load them in SWI-Prolog)\n\n% rewrite/3\nrewrite(['store\\'s'],[store],1).\nrewrite([get,rid,of],[delete],1).\nrewrite([the,game],[],1).\n\n% reliability/3\nreliability(frame(behavior),18,1).\nreliability(frame(connect_to),2,0).\nreliability(frame(create_object),22,4).\nreliability(frame(delete_object),5,0).\nreliability(frame(move_object),0,1).\nreliability(frame(rename_object),2,0).\nreliability(frame(set_property),12,13).\nreliability(frame(special),11,0).\nreliability(intent(archive),3,0).\nreliability(intent(copy),3,0).\nreliability(intent(count_files),3,0).\nreliability(intent(count_lines),3,0).\nreliability(intent(delete),3,0).\nreliability(intent(list_files),3,0).\nreliability(intent(make_dir),3,0).\nreliability(intent(move),3,0).\nreliability(intent(replace_text),3,0).\nreliability(intent(search_text),3,0).\nreliability(intent(show_file),3,0).\n\n% param/2\nparam(bias,-1.11072).\nparam(coverage,2.257904).\nparam(dry_errors,-2.4).\nparam(errors,-2.2).\nparam(frame_rel,0.858535).\nparam(fuzzy,-0.9).\nparam(inferred,-0.404714).\nparam(llm,0.4).\nparam(missing_paths,-1.8).\nparam(n_ops,-0.292096).\nparam(notes,-0.65517).\nparam(novel,-1.853353).\nparam(question,-0.6).\nparam(reliability,0.957997).\nparam(shell,1.213662).\nparam(unknown,-0.9).\nparam(verbless,-1.796907).\nparam(warnings,-0.25).\n\n",
+ "selective": [
+  {
+   "threshold": 0.0,
+   "coverage": 0.889,
+   "precision": 0.471,
+   "wrong_executions": 55
+  },
+  {
+   "threshold": 0.35,
+   "coverage": 0.658,
+   "precision": 0.636,
+   "wrong_executions": 28
+  },
+  {
+   "threshold": 0.5,
+   "coverage": 0.641,
+   "precision": 0.64,
+   "wrong_executions": 27
+  },
+  {
+   "threshold": 0.6,
+   "coverage": 0.573,
+   "precision": 0.716,
+   "wrong_executions": 19
+  },
+  {
+   "threshold": 0.7,
+   "coverage": 0.547,
+   "precision": 0.75,
+   "wrong_executions": 16
+  },
+  {
+   "threshold": 0.8,
+   "coverage": 0.538,
+   "precision": 0.762,
+   "wrong_executions": 15
+  },
+  {
+   "threshold": 0.9,
+   "coverage": 0.47,
+   "precision": 0.745,
+   "wrong_executions": 14
+  }
+ ],
+ "determinism": {
+  "nlcl": "117/117",
+  "runs": 5
+ },
+ "terminal": {
+  "nlcl-trained": {
+   "sentences": 33,
+   "effect_accuracy": 0.5758,
+   "silent_error_rate": 0.0,
+   "commands_verified": "21/38",
+   "unconfirmed_destructive_actions": 0,
+   "rows": [
+    {
+     "text": "display all python files in the folder src",
+     "right": true,
+     "weight": 0.971,
+     "source": "shell",
+     "executed": true
+    },
+    {
+     "text": "ls the python files in src",
+     "right": true,
+     "weight": 0.971,
+     "source": "shell",
+     "executed": true
+    },
+    {
+     "text": "which python files are in src",
+     "right": false,
+     "weight": 0.0,
+     "source": "rules",
+     "executed": false
+    },
+    {
+     "text": "count all .log files in logs",
+     "right": true,
+     "weight": 0.971,
+     "source": "shell",
+     "executed": true
+    },
+    {
+     "text": "how many log files does logs have",
+     "right": false,
+     "weight": 0.0,
+     "source": "rules",
+     "executed": false
+    },
+    {
+     "text": "tell me how many log files are in logs",
+     "right": false,
+     "weight": 0.0,
+     "source": "rules",
+     "executed": false
+    },
+    {
+     "text": "create a new directory named backup",
+     "right": true,
+     "weight": 0.971,
+     "source": "shell",
+     "executed": true
+    },
+    {
+     "text": "add a folder called backup",
+     "right": true,
+     "weight": 0.971,
+     "source": "shell",
+     "executed": true
+    },
+    {
+     "text": "I need a folder called backup",
+     "right": false,
+     "weight": 0.517,
+     "source": "rules",
+     "executed": false
+    },
+    {
+     "text": "erase all .tmp files in all subfolders",
+     "right": true,
+     "weight": 0.971,
+     "source": "shell",
+     "executed": true
+    },
+    {
+     "text": "clean up the temporary files everywhere",
+     "right": true,
+     "weight": 0.971,
+     "source": "shell",
+     "executed": true
+    },
+    {
+     "text": "wipe all .tmp files recursively",
+     "right": true,
+     "weight": 0.971,
+     "source": "shell",
+     "executed": true
+    },
+    {
+     "text": "copy the file notes.txt to backup.txt",
+     "right": true,
+     "weight": 0.971,
+     "source": "shell",
+     "executed": true
+    },
+    {
+     "text": "copy notes.txt into backup.txt",
+     "right": true,
+     "weight": 0.971,
+     "source": "shell",
+     "executed": true
+    },
+    {
+     "text": "clone notes.txt to backup.txt",
+     "right": false,
+     "weight": 0.019,
+     "source": "rules",
+     "executed": false
+    },
+    {
+     "text": "mv data.csv to people.csv",
+     "right": true,
+     "weight": 0.971,
+     "source": "shell",
+     "executed": true
+    },
+    {
+     "text": "rename data.csv as people.csv",
+     "right": true,
+     "weight": 0.971,
+     "source": "shell",
+     "executed": true
+    },
+    {
+     "text": "data.csv should be renamed to people.csv",
+     "right": false,
+     "weight": 0.019,
+     "source": "rules",
+     "executed": false
+    },
+    {
+     "text": "show me the first 2 lines in notes.txt",
+     "right": true,
+     "weight": 0.971,
+     "source": "shell",
+     "executed": true
+    },
+    {
+     "text": "head 2 lines of notes.txt",
+     "right": false,
+     "weight": 0.017,
+     "source": "rules",
+     "executed": false
+    },
+    {
+     "text": "read the first 2 lines of notes.txt",
+     "right": true,
+     "weight": 0.971,
+     "source": "shell",
+     "executed": true
+    },
+    {
+     "text": "grep 'TODO' in python files",
+     "right": true,
+     "weight": 0.971,
+     "source": "shell",
+     "executed": true
+    },
+    {
+     "text": "search all python files for 'TODO'",
+     "right": false,
+     "weight": 0.017,
+     "source": "rules",
+     "executed": false
+    },
+    {
+     "text": "where does 'TODO' appear in python files",
+     "right": false,
+     "weight": 0.0,
+     "source": "rules",
+     "executed": false
+    },
+    {
+     "text": "how many lines does data.csv have",
+     "right": true,
+     "weight": 0.971,
+     "source": "shell",
+     "executed": true
+    },
+    {
+     "text": "line count of data.csv",
+     "right": false,
+     "weight": 0.017,
+     "source": "rules",
+     "executed": false
+    },
+    {
+     "text": "tell me the number of lines in data.csv",
+     "right": false,
+     "weight": 0.017,
+     "source": "rules",
+     "executed": false
+    },
+    {
+     "text": "change 'apple' to 'pear' in notes.txt",
+     "right": false,
+     "weight": 0.433,
+     "source": "rules",
+     "executed": false
+    },
+    {
+     "text": "swap 'apple' for 'pear' in notes.txt",
+     "right": false,
+     "weight": 0.0,
+     "source": "rules",
+     "executed": false
+    },
+    {
+     "text": "replace every 'apple' by 'pear' in the file notes.txt",
+     "right": true,
+     "weight": 0.971,
+     "source": "shell",
+     "executed": true
+    },
+    {
+     "text": "make a zip of src called src.zip",
+     "right": false,
+     "weight": 0.517,
+     "source": "rules",
+     "executed": false
+    },
+    {
+     "text": "pack src into src.zip",
+     "right": true,
+     "weight": 0.971,
+     "source": "shell",
+     "executed": true
+    },
+    {
+     "text": "compress the folder src to src.zip",
+     "right": true,
+     "weight": 0.971,
+     "source": "shell",
+     "executed": true
+    }
+   ]
+  }
+ },
+ "cost": {
+  "nlcl_median_ms": 0.8,
+  "nlcl_tokens": 0
+ }
+}
