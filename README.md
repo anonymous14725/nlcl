@@ -184,11 +184,11 @@ Rules are attached to the entity whose property they change (not just the last o
 There is no offline parser for non-Latin scripts. With a free backend configured, the online agent rewrites the sentence as English NLCL commands (shown to you) and the normal pipeline runs them:
 
 ```
-> Create a player named Ali with 100 health; destroy it when its health reaches zero.
-  [groq] create a game player called ali with health 100
-  created game player 'ali' {health: 100, ...}
-  [groq] when health of ali is below 1, destroy ali
-  ali: behaviour on update if health < 1 -> 1 action(s)
+> Create a player named julia with 100 health; destroy it when its health reaches zero.
+  [groq] create a game player called julia with health 100
+  created game player 'julia' {health: 100, ...}
+  [groq] when health of julia is below 1, destroy julia
+  julia: behaviour on update if health < 1 -> 1 action(s)
 ```
 
 Without a backend the runtime answers that the online agent is needed (`:backend status`).
