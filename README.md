@@ -1,78 +1,71 @@
 # NLCL — Natural Language Computational Language
 
-**زبان محاسباتی زبان طبیعی** — پیاده‌سازی نمونه‌ی اولیه‌ی ایده‌ی M. M. Shamshiri (۲۰۱۹)
+**A computational language based on natural language** — a prototype implementation of the idea by M. M. Shamshiri (2019).
 
-> زبان طبیعی نه فقط به‌عنوان رابط، بلکه به‌عنوان خودِ زبان برنامه‌نویسی: جمله‌ها به توکن‌های معنایی تبدیل می‌شوند،
-> توکن‌ها به ساختار محاسباتی، ساختار به یک نمایش میانی مستقل از زبان (IR)، و IR به کد چند ماژول مختلف
-> (بازی، پایتون، سیستم‌های تعبیه‌شده، سخت‌افزار/Verilog، C++، صحنه‌ی سه‌بعدی، CAD) که با هم کار می‌کنند.
+> Natural language is not merely an interface; it is the programming language itself. Sentences become semantic tokens, tokens become computational structures, structures become a language-independent intermediate representation (IR), and the IR generates code for multiple modules (games, Python, embedded systems, hardware/Verilog, C++, 3D scenes, and CAD) that work together.
 
 ---
 
-## فارسی
+## Project overview
 
-### چه چیزی ساخته شده؟
+### What has been built?
 
+```text
+Human text/speech
+ → Semantic tokenization       (atomic: CREATE, OBJECT, CONNECT ...)
+ → Composite tokens            (CREATE + OBJECT → CREATE_OBJECT)
+ → Computational structure    (IR operations on a “persistent state”)
+ → Universal intermediate representation (IR)
+                                 CREATE(domain=GAME, type=object, properties={health: 100})
+ → Multi-module composition   (communication channels between modules: serial / http / mqtt / spi / i2c ...)
+ → Code generation             (each module targets its own environment)
+ → Execution / simulation      (using free tools)
 ```
-متن/گفتار انسان
- → توکن‌سازی معنایی        (atomic: CREATE, OBJECT, CONNECT ...)
- → توکن‌های ترکیبی          (CREATE + OBJECT → CREATE_OBJECT)
- → ساختار محاسباتی         (عملیات IR روی یک «وضعیت پایدار»)
- → نمایش میانی جهانی (IR)   CREATE(domain=GAME, type=object, properties={health: 100})
- → ترکیب چند ماژولی        (کانال‌های ارتباطی بین ماژول‌ها: serial / http / mqtt / spi / i2c ...)
- → تولید کد                 (هر ماژول برای محیط خودش)
- → اجرا / شبیه‌سازی          (با ابزارهای رایگان)
-```
 
-- **هسته کاملاً آفلاین و رایگان است**: فقط کتابخانه‌ی استاندارد پایتون، بدون هیچ `pip install`.
-- **مدل زبانی رایگان (آنلاین)**: جمله‌های انگلیسی آفلاین پردازش می‌شوند. **فارسی (و هر زبان غیرلاتین) فقط آنلاین**
-  پردازش می‌شود: عامل آنلاین جمله را به دستورهای انگلیسیِ خودِ زبان برمی‌گرداند و همان مسیر آزموده‌شده اجرا می‌شود.
-  بدون کلید API، ورودی فارسی پیام «به عامل آنلاین نیاز است» می‌دهد. رفع باگ هوشمند هم آنلاین است.
-- **ماژول‌ها افزونه‌اند**: هر فایل در `nlcl/modules/` که یک `MODULE` داشته باشد، یک دامنه‌ی جدید اضافه می‌کند.
+- **The core is fully offline and free:** it uses only the Python standard library; no `pip install` is required.
+- **Free online language-model support:** English sentences are processed offline. Persian and other non-Latin languages require an online backend: the agent rewrites a sentence as English NLCL commands, then runs them through the tested pipeline. Without an API key, Persian input prompts you to use an online agent. Smart bug fixing also requires an online backend.
+- **Modules are plugins:** any file in `nlcl/modules/` that provides a `MODULE` adds a new domain.
 
-### سه سازوکار توکن‌سازی (همان بخش ۲ نامه)
+### Three tokenization mechanisms (section 2 of the proposal)
 
-| سازوکار | پیاده‌سازی |
+| Mechanism | Implementation |
 |---|---|
-| A. توکن‌های اتمی | `nlcl/tokens.py → ATOMIC` (create, delete, connect ...) |
-| B. توکن‌های ترکیبی | `COMPOSITE` : الگوهای ترتیبی مثل `CREATE + ARTICLE + OBJECT → CREATE_OBJECT`؛ قابل گسترش در زمان اجرا |
-| C. واژگان تطبیقی | `:teach spawn create`، تعریف دستور جدید با `define patrol(d) as ...`؛ هر تعریف قبل از پذیرش با **اجرای آزمایشی روی کپی وضعیت** اعتبارسنجی می‌شود؛ با LLM، واژه‌های ناشناخته پیشنهاد می‌شوند و با `:accept` پذیرفته می‌شوند |
+| A. Atomic tokens | `nlcl/tokens.py → ATOMIC` (create, delete, connect ...) |
+| B. Composite tokens | `COMPOSITE`: ordered patterns such as `CREATE + ARTICLE + OBJECT → CREATE_OBJECT`; extensible at runtime |
+| C. Adaptive vocabulary | `:teach spawn create`; define new commands with `define patrol(d) as ...`. Each definition is tested before it is accepted. |
 
-### مفهوم جهانی «شیء» (بخش ۳)
+### The universal concept of an “object” (section 3)
 
-`create an object` → سیستم دامنه را حدس **نمی‌زند** و می‌پرسد: *What kind of object would you like to create?*
-همان شیء در هر دامنه پیاده‌سازی متفاوتی دارد (GameObject در Unity، کلاس پایتون، رجیستر در Verilog، مدل OpenSCAD ...).
+`create an object` → the system does **not** guess the domain. It asks: *What kind of object would you like to create?* The same object has a different implementation in each domain (a Unity GameObject, a Python class, a Verilog register, an OpenSCAD model, and so on).
 
-### نصب و اجرا
+### Installation and usage
 
 ```bash
 cd nlcl
-python -m nlcl                      # محیط تعاملی
+python -m nlcl                      # interactive environment
 python -m nlcl examples/game.nl --run
 python -m nlcl examples/smart_greenhouse.nl --build
 python -m unittest discover -s tests
 ```
 
-### APIهای رایگان (همه اختیاری)
+### Free APIs (all optional)
 
-| backend | متغیر محیطی | توضیح |
+| Backend | Environment variable | Description |
 |---|---|---|
-| `ollama` | — | کاملاً محلی و رایگان (ollama.com) — `ollama pull llama3.2` |
-| `groq` | `GROQ_API_KEY` | سطح رایگان، بسیار سریع |
-| `gemini` | `GEMINI_API_KEY` | سطح رایگان Google AI Studio |
-| `openrouter` | `OPENROUTER_API_KEY` | مدل‌های `:free` |
-| `cerebras` | `CEREBRAS_API_KEY` | سطح رایگان |
-| `mistral` | `MISTRAL_API_KEY` | پلن رایگان Experiment |
-| `huggingface` | `HF_TOKEN` | اعتبار ماهانه‌ی رایگان |
-| `github` | `GITHUB_TOKEN` | GitHub Models (رایگان با محدودیت) |
+| `ollama` | — | Fully local and free (ollama.com) — `ollama pull llama3.2` |
+| `groq` | `GROQ_API_KEY` | Free tier, very fast |
+| `gemini` | `GEMINI_API_KEY` | Google AI Studio free tier |
+| `openrouter` | `OPENROUTER_API_KEY` | `:free` models |
+| `cerebras` | `CEREBRAS_API_KEY` | Free tier |
+| `mistral` | `MISTRAL_API_KEY` | Free Experiment plan |
+| `huggingface` | `HF_TOKEN` | Free monthly allowance |
+| `github` | `GITHUB_TOKEN` | GitHub Models (free with limits) |
 
-اولین backend در دسترس خودکار انتخاب می‌شود. نام مدل‌ها را با `NLCL_<NAME>_MODEL` تغییر دهید
-(مثلاً `NLCL_GROQ_MODEL`). وضعیت: `:backend status`. بدون هیچ کلیدی هم همه‌چیز با پارسر آفلاین کار می‌کند.
+The first available backend is selected automatically. Change model names with `NLCL_<NAME>_MODEL` (for example, `NLCL_GROQ_MODEL`). Check status with `:backend status`. Without any API keys, everything works with the offline parser.
 
 ---
 
-## English
-
-### Quick start
+## Quick start
 
 ```bash
 python -m nlcl                         # interactive natural-language runtime
@@ -106,16 +99,11 @@ CONNECT(target=temp, dst=monitor, via=http, properties={"fields": ["temperature"
 
 Ops: `CREATE SET UNSET DELETE CONNECT DISCONNECT RENAME BEHAVIOR DOMAIN FOCUS` + meta `SHOW BUILD RUN UNDO DEFINE`.
 Behaviour triggers: `start update collision input:<key> timer:<ms> change:<prop> message:<src>`;
-actions: `set add toggle destroy log move send call`; conditions use a tiny C-like expression language that
-every module renders into its own target (Python, C, C#, GDScript, JS, Verilog ...).
+actions: `set add toggle destroy log move send call`; conditions use a tiny C-like expression language that every module renders into its own target (Python, C, C#, GDScript, JS, Verilog ...).
 
 ### Multi-module systems
 
-Entities from different domains are connected with `connect A to B via <protocol>`. The composer turns every
-link into a **channel contract** (protocol, fields, interval, port/topic/baud) that both modules implement,
-then writes `system.json` (IR) and `SYSTEM.md` (architecture diagram + how to run each part with free tools).
-When two non-Python modules talk over HTTP, the Python module automatically emits a small **hub** with a live
-web dashboard (`http://localhost:8765`) and serial→HTTP bridges.
+Entities from different domains are connected with `connect A to B via <protocol>`. The composer turns every link into a **channel contract** (protocol, fields, interval, port/topic/baud) that both modules implement, then writes `system.json` (IR) and `SYSTEM.md` (architecture diagram + how to run each part with free tools). When two non-Python modules talk over HTTP, the Python module automatically emits a small **hub** with a live web dashboard (`http://localhost:8765`) and serial→HTTP bridges.
 
 | domain | output | free tools |
 |---|---|---|
@@ -130,8 +118,7 @@ web dashboard (`http://localhost:8765`) and serial→HTTP bridges.
 
 ### REPL commands
 
-`:help :show :ir :trace on|off :build [dir] :run [domain] :files :save :load :new :undo :domains :vocab
-:teach <word> <TOKEN> :forget <word> :accept :backend [status|auto|off|name] :mode rules|hybrid|llm :quit`
+`:help :show :ir :trace on|off :build [dir] :run [domain] :files :save :load :new :undo :domains :vocab :teach <word> <TOKEN> :forget <word> :accept :backend [status|auto|off|name] :mode rules|hybrid|llm :quit`
 
 ### Writing a new module
 
@@ -190,17 +177,14 @@ add 1 to score every 3 seconds  /  make the led blink every 500 ms
 when bell is pressed, increase visits count by 1 and set door angle to 90   # split across 2 entities
 ```
 
-Rules are attached to the entity whose property they change (not just the last one created), names like
-`bob lives` / `temperature of temp` resolve to `bob.lives` / `temp.temperature`, and renaming an entity updates
-every rule and link that mentions it.
+Rules are attached to the entity whose property they change (not just the last one created), names like `bob lives` / `temperature of temp` resolve to `bob.lives` / `temp.temperature`, and renaming an entity updates every rule and link that mentions it.
 
-### Other languages (Persian, ...) - online only
+### Other languages (Persian, ...) — online only
 
-There is no offline parser for non-Latin scripts. With a free backend configured, the online agent rewrites the
-sentence as English NLCL commands (shown to you) and the normal pipeline runs them:
+There is no offline parser for non-Latin scripts. With a free backend configured, the online agent rewrites the sentence as English NLCL commands (shown to you) and the normal pipeline runs them:
 
 ```
-> یه بازیکن به اسم علی بساز با ۱۰۰ تا جون، وقتی جونش صفر شد حذفش کن
+> Create a player named Ali with 100 health; destroy it when its health reaches zero.
   [groq] create a game player called ali with health 100
   created game player 'ali' {health: 100, ...}
   [groq] when health of ali is below 1, destroy ali
@@ -221,7 +205,7 @@ when value of display is above 19, print 'limit reached: {value}'
 build it
 ```
 
-produces, from the same description:
+Produces, from the same description:
 
 | target | files | how |
 |---|---|---|
@@ -229,10 +213,7 @@ produces, from the same description:
 | native executables | `build_windows.bat`, `build_macos.sh`, `build_linux.sh` | free PyInstaller: `.exe`, `.app`, Linux binary + `.desktop` |
 | Android / iOS / ChromeOS / browser | `web/` (installable PWA, offline cache) | serve the folder, "Add to Home screen" |
 
-Widgets: app/window, form/panel, label, button, input, password, textarea, checkbox, switch, slider, progress,
-dropdown, list, canvas. Events: `when <button> is pressed`, `when <key> is pressed`, `every N seconds`,
-`when <prop> of <widget> changes`, `when <condition>`. Apps talk to other modules (firmware, FPGA, Python
-services) with `connect ... via http`. `run it` executes a self-test of both the desktop and the web build.
+Widgets: app/window, form/panel, label, button, input, password, textarea, checkbox, switch, slider, progress, dropdown, list, canvas. Events: `when <button> is pressed`, `when <key> is pressed`, `every N seconds`, `when <prop> of <widget> changes`, `when <condition>`. Apps talk to other modules (firmware, FPGA, Python services) with `connect ... via http`. `run it` executes a self-test of both the desktop and the web build.
 
 ### Smart bug fixing (every module, and code you already have)
 
@@ -245,25 +226,17 @@ check the game code                                      # diagnostics only (wor
 :fix undo                                                # restore the files from the last fix
 ```
 
-1. **Diagnose (offline, real tools):** Python compile, `node --check` for JS and for scripts inside HTML, JSON,
-   C/C++ (`g++`/`clang++` if installed), Verilog (`iverilog`/`verilator`), OpenSCAD, GDScript (`godot`),
-   bracket/structure checks for C#, Arduino, Verilog and every C-like file, and an optional run of the program
-   (tracebacks become diagnostics).
-2. **Fix (online agent):** the code, the diagnostics and your description go to the LLM, which returns small
-   search/replace edits. Edits are applied with a backup (`.nlcl_backup/`), everything is re-checked, and a
-   round that makes things worse is rolled back and reported to the agent (up to 3 rounds).
+1. **Diagnose (offline, real tools):** Python compile, `node --check` for JS and for scripts inside HTML, JSON, C/C++ (`g++`/`clang++` if installed), Verilog (`iverilog`/`verilator`), OpenSCAD, GDScript (`godot`), bracket/structure checks for C#, Arduino, Verilog and every C-like file, and an optional run of the program (tracebacks become diagnostics).
+2. **Fix (online agent):** the code, the diagnostics and your description go to the LLM, which returns small search/replace edits. Edits are applied with a backup (`.nlcl_backup/`), everything is re-checked, and a round that makes things worse is rolled back and reported to the agent (up to 3 rounds).
 3. **Generated code:** fixes are remembered in the system state and re-applied after every rebuild.
 
 Without a backend, `fix` only locates problems; changing code needs the online agent.
 
 ### Honest limits
 
-- The offline parser covers common sentence shapes, not all of English. Other languages and bug fixing need a
-  (free) online backend; their quality depends on the model you choose.
-- Generated code is a solid starting point, not a verified product; only Python (and JS syntax) can be executed
-  here without installing toolchains. Hardware/embedded output is meant for free simulators (Icarus, Wokwi).
-- Dedicated hardware for semantic operations (section 6 of the proposal) is out of scope; the software
-  prototype is the measurement baseline the proposal asks for first.
+- The offline parser covers common sentence shapes, not all of English. Other languages and bug fixing need a (free) online backend; their quality depends on the model you choose.
+- Generated code is a solid starting point, not a verified product; only Python (and JS syntax) can be executed here without installing toolchains. Hardware/embedded output is meant for free simulators (Icarus, Wokwi).
+- Dedicated hardware for semantic operations (section 6 of the proposal) is out of scope; the software prototype is the measurement baseline the proposal asks for first.
 
 ## Semantic architecture (v2): knowledge base, weighting, learning, terminal, benchmark
 
@@ -281,11 +254,11 @@ sentence ─► semantic tokens ─► candidate interpretations (rules / termin
 | part | file | what it does |
 |---|---|---|
 | Prolog engine | `nlcl/prolog.py` | dependency-free ISO subset: resolution, cut, if-then-else, negation, findall/setof, assert |
-| knowledge base | `nlcl/kb/core.pl`, `~/.nlcl/learned.pl` | domain ontology, reliability of every token/frame/intent, safety rules, terminal meanings, languages; learned facts are readable Prolog. `:kb export kb.pl` gives one file SWI-Prolog loads |
-| weighting | `nlcl/weights.py` | 17 measurable features (coverage, unknown words, invented properties, missing verb, dry-run errors, learned reliability…) → logistic weight; `:why` shows them |
-| learning | `nlcl/learn.py` | correctness is semantic (same resulting state). `:train` induces rewrite rules (accepted only if they fix examples and break none, never erasing a core verb or a content word), records evidence, fits the weights. `:test` scores held-out sentences |
-| discovery | `nlcl/discover.py` | unknown word → closest known form, asked once then remembered; online teacher's answer distilled into an offline rule; a language with no module (`a kotlin program`) grows a new module, persisted in the KB |
-| terminal | `nlcl/shell.py` | sentence → intent + slots → exact effect (reference implementation) + bash and PowerShell text. File-changing commands run in a sandbox copy first and show the diff; destructive ones need a yes; protected paths are refused by Prolog rules |
+| knowledge base | `nlcl/kb/core.pl`, `~/.nlcl/learned.pl` | domain ontology, reliability of every token/frame/intent, safety rules, terminal meanings, languages; learned facts are readable Prolog. `:kb export kb.pl` creates one file that SWI-Prolog can load |
+| weighting | `nlcl/weights.py` | 17 measurable features (coverage, unknown words, invented properties, missing verb, dry-run errors, learned reliability...) → logistic weight; `:why` shows them |
+| learning | `nlcl/learn.py` | correctness is semantic (same resulting state). `:train` induces rewrite rules (accepted only if they fix examples and break none, never erasing a core verb or content word), records evidence and fits weights. `:test` scores held-out sentences |
+| discovery | `nlcl/discover.py` | unknown word → closest known form, asked once then remembered; online teacher's answer distilled into an offline rule; a language with no module (for example, a Kotlin program) grows a new module, persisted in the KB |
+| terminal | `nlcl/shell.py` | sentence → intent + slots → exact effect (reference implementation) + bash and PowerShell text. File-changing commands run in a sandbox copy first and show the diff; destructive commands require confirmation; protected paths are refused by Prolog rules |
 | benchmark | `python -m nlcl.bench` | `bench/HYPOTHESES.md` (pre-registered) → `bench/results/report.md` |
 
 ### What the benchmark measured (held-out sentences, offline, this machine)
@@ -301,15 +274,10 @@ sentence ─► semantic tokens ─► candidate interpretations (rules / termin
 | terminal: files changed without showing the diff first | – | 0 |
 | cost | 0 tokens, ~1 ms | 0 tokens, ~1 ms |
 
-Honest reading: the measurable advantages are **refusing what it does not understand, calibrated confidence,
-determinism, verified terminal commands, safety and zero cost**. Raw accuracy on free paraphrases is low offline
-(H4 in the hypotheses predicts that a language model wins there). The comparison with a language model
-(`llm-direct`, `nlcl+teacher`) needs an API key: `python -m nlcl.bench --backend auto`.
+Honest reading: the measurable advantages are **refusing what it does not understand, calibrated confidence, determinism, verified terminal commands, safety and zero cost**. Raw accuracy on free paraphrases is low offline (H4 in the hypotheses predicts that a language model wins there). The comparison with a language model (`llm-direct`, `nlcl+teacher`) needs an API key: `python -m nlcl.bench --backend auto`.
 
 ## Credits and licence
 
-The idea and design goals are by M. M. Shamshiri (concept from 2019); see `PROPOSAL.md`.
-The prototype was written with the help of Claude (Anthropic) through Claude Code: most of the code by
-Claude Opus 5.5, later features and fixes by Claude Fable 5.2. This does not imply endorsement by Anthropic.
+The idea and design goals are by M. M. Shamshiri (concept from 2019); see `PROPOSAL.md`. The prototype was written with the help of Claude (Anthropic) through Claude Code: most of the code by Claude Opus 5.5, later features and fixes by Claude Fable 5.2. This does not imply endorsement by Anthropic.
 
 Released under the MIT licence (`LICENSE`).
