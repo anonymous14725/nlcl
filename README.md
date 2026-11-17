@@ -23,7 +23,7 @@ Human text/speech
 ```
 
 - **The core is fully offline and free:** it uses only the Python standard library; no `pip install` is required.
-- **Free online language-model support:** English sentences are processed offline. Persian and other non-Latin languages require an online backend: the agent rewrites a sentence as English NLCL commands, then runs them through the tested pipeline. Without an API key, Persian input prompts you to use an online agent. Smart bug fixing also requires an online backend.
+- **Free online language-model support:** English sentences are processed offline. Persian and dutch and french and spanish and Portuguese and other non-Latin languages require an online backend: the agent rewrites a sentence as English NLCL commands, then runs them through the tested pipeline. Without an API key, dutch and other input prompts you to use an online agent. Smart bug fixing also requires an online backend.
 - **Modules are plugins:** any file in `nlcl/modules/` that provides a `MODULE` adds a new domain.
 
 ### Three tokenization mechanisms (section 2 of the proposal)
@@ -179,7 +179,7 @@ when bell is pressed, increase visits count by 1 and set door angle to 90   # sp
 
 Rules are attached to the entity whose property they change (not just the last one created), names like `bob lives` / `temperature of temp` resolve to `bob.lives` / `temp.temperature`, and renaming an entity updates every rule and link that mentions it.
 
-### Other languages (Persian, ...) — online only
+### Other languages (Persian, dutch, french, spanish, Portuguese, ...) — online only
 
 There is no offline parser for non-Latin scripts. With a free backend configured, the online agent rewrites the sentence as English NLCL commands (shown to you) and the normal pipeline runs them:
 
