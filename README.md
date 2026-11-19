@@ -179,9 +179,11 @@ when bell is pressed, increase visits count by 1 and set door angle to 90   # sp
 
 Rules are attached to the entity whose property they change (not just the last one created), names like `bob lives` / `temperature of temp` resolve to `bob.lives` / `temp.temperature`, and renaming an entity updates every rule and link that mentions it.
 
-### Other languages (Persian, dutch, french, spanish, Portuguese, ...) — online only
+### Other languages — online only
 
-There is no offline parser for non-Latin scripts. With a free backend configured, the online agent rewrites the sentence as English NLCL commands (shown to you) and the normal pipeline runs them:
+The offline parser handles common English sentence patterns; it does not parse prompts in other languages. With a free backend configured, the online agent rewrites the prompt as English NLCL commands (shown to you), then the normal pipeline runs them. This applies to languages written in both Latin and non-Latin scripts.
+
+Without a backend, the runtime indicates that the online agent is needed (`:backend status`).
 
 ```
 > Create a player named julia with 100 health; destroy it when its health reaches zero.
@@ -189,9 +191,19 @@ There is no offline parser for non-Latin scripts. With a free backend configured
   created game player 'julia' {health: 100, ...}
   [groq] when health of julia is below 1, destroy julia
   julia: behaviour on update if health < 1 -> 1 action(s)
+```### Other languages — online backend required
+
+The offline rule-based parser handles common English sentence patterns, but does not parse prompts in other languages. With a free backend configured, the online agent rewrites a prompt as English NLCL commands (shown to you), then the normal pipeline runs them. This applies to languages written in either Latin or non-Latin scripts:
+
+```text
+> یک بازیکن به نام جولیا با ۱۰۰ سلامتی بساز؛ وقتی سلامتی‌اش به صفر رسید، نابودش کن.
+  [groq] create a game player called julia with health 100
+  created game player 'julia' {health: 100, ...}
+  [groq] when health of julia is below 1, destroy julia
+  julia: behaviour on update if health < 1 -> 1 action(s)
 ```
 
-Without a backend the runtime answers that the online agent is needed (`:backend status`).
+Without a backend, the runtime answers that the online agent is needed (`:backend status`).
 
 ### Applications for every operating system (`app` domain)
 
@@ -270,9 +282,13 @@ sentence ─► semantic tokens ─► candidate interpretations (rules / termin
 | nonsense / out-of-scope refused | 1/12 | 9/12 |
 | calibration error of the weight (ECE) | 0.38 | 0.19 |
 | identical result on repeated runs | 117/117 | 117/117 |
-| terminal: generated bash + PowerShell verified in a sandbox | – | 38/38 |
-| terminal: files changed without showing the diff first | – | 0 |
+| terminal: generated bash + PowerShell verified in a sandbox | – | 21/38 |
+| terminal: same filesystem effect as the intended command | – | 0.5758 |
+| terminal: executed with the wrong effect | – | 0.0 |
+| terminal: files changed/deleted without showing the diff first | – | 0 |
 | cost | 0 tokens, ~1 ms | 0 tokens, ~1 ms |
+
+The benchmark results are reported in [`bench/results/report.md`](bench/results/report.md).
 
 Honest reading: the measurable advantages are **refusing what it does not understand, calibrated confidence, determinism, verified terminal commands, safety and zero cost**. Raw accuracy on free paraphrases is low offline (H4 in the hypotheses predicts that a language model wins there). The comparison with a language model (`llm-direct`, `nlcl+teacher`) needs an API key: `python -m nlcl.bench --backend auto`.
 
