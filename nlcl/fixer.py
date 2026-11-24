@@ -55,6 +55,8 @@ class FixReport:
     edits: list[dict] = field(default_factory=list)             # applied {file, search, replace}
     backup: str | None = None
     notes: list[str] = field(default_factory=list)
+    pending: dict = field(default_factory=dict)      # real path -> (new text, crlf) waiting for confirmation
+    root: str | None = None
 
     def lines(self) -> list[str]:
         out = [f"  {self.summary}"]
@@ -70,6 +72,8 @@ class FixReport:
             out += [f"    {d}" for d in self.after[:12]]
         if self.backup:
             out.append(f"  originals saved in {self.backup}  (':fix undo' restores them)")
+        if self.pending:
+            out.append(f"  nothing has been written yet: {len(self.pending)} file(s) waiting for your confirmation")
         return out
 
 
@@ -320,13 +324,57 @@ class Fixer:
 
     # ---- public ---------------------------------------------------------------
     def fix(self, target: Path, description: str = "", run_cmd: list[str] | None = None,
-            focus: list[str] | None = None) -> FixReport:
+            focus: list[str] | None = None, apply: bool = True) -> FixReport:
+        """apply=False: the agent works on a temporary copy; the report carries the diff and the new
+        contents in `pending`, and nothing touches the real files until commit(report)."""
         target = Path(target)
         if not target.exists():
             return FixReport(False, f"'{target}' does not exist")
-        root, files = collect(target)
-        if not files:
+        real_root, real_files = collect(target)
+        if not real_files:
             return FixReport(False, f"no source files found in {target}")
+        if apply:
+            return self._fix(target, description, run_cmd, focus)
+        import tempfile
+        with tempfile.TemporaryDirectory(prefix="nlcl_fix_") as td:
+            work = Path(td) / real_root.name
+            if target.is_file():
+                work.mkdir(parents=True)
+                shutil.copy2(target, work / target.name)
+                wtarget = work / target.name
+            else:
+                shutil.copytree(real_root, work, ignore=shutil.ignore_patterns(".nlcl_backup", ".git", "node_modules"))
+                wtarget = work
+            rep = self._fix(wtarget, description, run_cmd, focus, keep_backup=False)
+            for rel in rep.changed:
+                text, crlf = _read(work / rel)
+                rep.pending[str(real_root / rel)] = (text, crlf)
+            rep.root = str(real_root)
+            rep.backup = None
+            if rep.changed:
+                rep.summary = rep.summary.replace("fixed ", "proposed fix for ", 1)
+        return rep
+
+    @staticmethod
+    def commit(rep: "FixReport") -> list[str]:
+        """Write a confirmed fix (from fix(apply=False)) to the real files, with a backup."""
+        if not rep.pending:
+            return ["  nothing to apply"]
+        root = Path(rep.root)
+        originals = {}
+        for path in rep.pending:
+            p = Path(path)
+            originals[p] = _read(p)
+        backup = Fixer._backup(root, originals)
+        for path, (text, crlf) in rep.pending.items():
+            _write(Path(path), text, crlf)
+        rep.backup = str(backup)
+        n = len(rep.pending)
+        rep.pending = {}
+        return [f"  applied the fix to {n} file(s); originals saved in {backup}  (':fix undo' restores them)"]
+
+    def _fix(self, target: Path, description: str, run_cmd, focus, keep_backup: bool = True) -> FixReport:
+        root, files = collect(target)
         before = diagnose(target, run_cmd)
         if self.backend is None:
             if before:
@@ -357,15 +405,15 @@ class Fixer:
                     break
                 feedback = "You returned no edits but said you are not done. Return edits or done=true."
                 continue
-            snapshot = {p: p.read_text(encoding="utf-8", errors="replace") for p in files}
+            snapshot = {p: _read(p) for p in files}
             ok_edits, failed = [], []
             for ed in edits:
                 r = self._apply(root, files, ed, originals)
                 (ok_edits if r is None else failed).append(ed if r is None else f"{ed.get('file')}: {r}")
             new = diagnose(target, run_cmd)
             if _errors(new) > _errors(diags):
-                for p, txt in snapshot.items():            # roll the round back
-                    p.write_text(txt, encoding="utf-8", newline="")
+                for p, (txt, crlf) in snapshot.items():    # roll the round back
+                    _write(p, txt, crlf)
                 feedback = ("Your edits were ROLLED BACK because they introduced new problems:\n"
                             + "\n".join(str(d) for d in new[:8]))
                 notes.append(f"round {rnd}: rolled back (edits made it worse)")
@@ -381,13 +429,13 @@ class Fixer:
             if not _errors(diags) and not failed:
                 feedback = "Tools report no problems now. Return done=true if the bug described by the user is fixed."
         changed, backup = {}, None
-        for p, old in originals.items():
-            new_txt = p.read_text(encoding="utf-8", errors="replace")
+        for p, (old, _crlf) in originals.items():
+            new_txt = _read(p)[0]
             if new_txt != old:
                 rel = str(p.relative_to(root)).replace("\\", "/")
                 changed[rel] = "".join(difflib.unified_diff(old.splitlines(True), new_txt.splitlines(True),
                                                             "before/" + rel, "after/" + rel, n=2))
-        if changed:
+        if changed and keep_backup:
             backup = str(self._backup(root, originals))
         ok = not _errors(diags)
         if changed:
@@ -447,13 +495,18 @@ class Fixer:
         """Apply one edit. Returns None on success or the reason it failed."""
         if not isinstance(ed, dict) or "file" not in ed or "search" not in ed or "replace" not in ed:
             return "malformed edit"
-        rel = str(ed["file"]).replace("\\", "/").lstrip("./")
+        rel = str(ed["file"]).replace("\\", "/")
+        while rel.startswith("./"):                 # a "./" prefix, not every leading '.' (".env" stays ".env")
+            rel = rel[2:]
         p = next((f for f in files if str(f.relative_to(root)).replace("\\", "/") == rel), None)
         if p is None:
-            p = next((f for f in files if f.name == Path(rel).name), None)
+            same = [f for f in files if f.name == Path(rel).name]
+            if len(same) > 1:
+                return f"ambiguous file name {Path(rel).name!r}: use its path ({', '.join(str(f.relative_to(root)) for f in same[:4])})"
+            p = same[0] if same else None
         if p is None:
             return "not one of the given files"
-        txt = p.read_text(encoding="utf-8", errors="replace")
+        txt, crlf = _read(p)
         search, repl = str(ed["search"]), str(ed["replace"])
         if not search:
             return "empty search"
@@ -480,8 +533,8 @@ class Fixer:
             new_txt = txt.replace(search, repl, 1)
         if new_txt == txt:
             return "edit changes nothing"
-        originals.setdefault(p, txt)
-        p.write_text(new_txt, encoding="utf-8", newline="")
+        originals.setdefault(p, (txt, crlf))
+        _write(p, new_txt, crlf)
         return None
 
     @staticmethod
@@ -491,11 +544,25 @@ class Fixer:
         while d.exists():
             n += 1
             d = root / ".nlcl_backup" / (time.strftime("%Y%m%d-%H%M%S") + f"-{n}")
-        for p, old in originals.items():
+        for p, (old, crlf) in originals.items():
             dst = d / p.relative_to(root)
             dst.parent.mkdir(parents=True, exist_ok=True)
-            dst.write_text(old, encoding="utf-8", newline="")
+            _write(dst, old, crlf)
         return d
+
+
+def _read(p: Path) -> tuple[str, bool]:
+    """Text with '\\n' line ends + whether the file used CRLF (so a fix keeps the file's line endings)."""
+    raw = Path(p).read_bytes().decode("utf-8", "replace")
+    crlf = "\r\n" in raw
+    return raw.replace("\r\n", "\n"), crlf
+
+
+def _write(p: Path, text: str, crlf: bool) -> None:
+    data = text.replace("\r\n", "\n")
+    if crlf:
+        data = data.replace("\n", "\r\n")
+    Path(p).write_bytes(data.encode("utf-8"))
 
 
 def _errors(diags: list[Diag]) -> int:
