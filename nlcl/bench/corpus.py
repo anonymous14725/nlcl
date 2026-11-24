@@ -183,19 +183,24 @@ INVALID_TEST = ["glorp the snizzle", "what time is it", "make it awesome", "plea
                 "wobble wobble", "do what I mean", "turn the frobnitz", "be smarter"]
 
 
-def build_examples():
+def build_examples(extended: bool = True):
+    import copy
     from ..learn import Example
+    from .corpus2 import extend
+    intents, inv_tr, inv_te = copy.deepcopy(INTENTS), list(INVALID_TRAIN), list(INVALID_TEST)
+    if extended:
+        extend(intents, inv_tr, inv_te)
     out = []
-    for it in INTENTS:
+    for it in intents:
         for split in ("train", "test"):
             for i, text in enumerate(it[split]):
                 out.append(Example(id=f"{it['id']}:{split}{i}", text=text, split=split, context=list(it["context"]),
-                                   gold=list(it["gold"]), valid=True, intent=it["id"]))
+                                   gold=list(it["gold"]), valid=True, intent=it["id"], holdout=bool(it.get("holdout"))))
         out.append(Example(id=f"{it['id']}:gold", text=it["gold"][-1], split="gold", context=list(it["context"]) + it["gold"][:-1],
                            gold=list(it["gold"]), valid=True, intent=it["id"]))
     ctx = HERO
-    for i, t in enumerate(INVALID_TRAIN):
+    for i, t in enumerate(inv_tr):
         out.append(Example(id=f"invalid:train{i}", text=t, split="train", context=ctx, gold=[], valid=False, intent="invalid"))
-    for i, t in enumerate(INVALID_TEST):
+    for i, t in enumerate(inv_te):
         out.append(Example(id=f"invalid:test{i}", text=t, split="test", context=ctx, gold=[], valid=False, intent="invalid"))
     return out
