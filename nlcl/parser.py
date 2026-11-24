@@ -49,12 +49,27 @@ class RuleParser:
         self.modules = modules
         self.known_kinds: set[str] = set()
         self.kind_names: set[str] = set()          # real kinds only (not keywords)
-        self.rewrites: list[tuple[list[str], list[str], int]] = []   # learned: [get,rid,of] -> [delete]
+        self.synonyms: list[tuple[list[str], list[str], int]] = []    # reviewed: [fsm] -> [state, machine]
+        self._learned: list[tuple[list[str], list[str], int]] = []    # learned: [get,rid,of] -> [delete]
+        self.table = RewriteTable()
         for m in modules.values():
             self.known_kinds |= {k.lower() for k in m.kinds}
             self.kind_names |= {k.lower() for k in m.kinds}
             self.known_kinds |= {k.lower() for k in m.keywords}
         self.known_kinds |= {"object", "entity", "thing", "item", "component"}
+
+    @property
+    def rewrites(self):
+        return self._learned
+
+    @rewrites.setter
+    def rewrites(self, rules):
+        self._learned = list(rules or [])
+        self.table = RewriteTable(self._learned + self.synonyms)
+
+    def set_synonyms(self, syn) -> None:
+        self.synonyms = list(syn or [])
+        self.table = RewriteTable(self._learned + self.synonyms)
 
     def refresh_modules(self, modules: dict) -> None:
         """A module was discovered at run time: its kinds join the vocabulary."""
@@ -124,7 +139,13 @@ class RuleParser:
                 res.clauses.append((clause, "DELETE_OBJECT", toks))
                 res.ops.append(Op("DELETE", target=_strip_articles(clause)))
                 continue
-            frame = self._frame(clause, toks, prev_frame)
+            try:
+                frame = self._frame(clause, toks, prev_frame)
+            except ValueError as e:
+                res.clauses.append((clause, None, toks))
+                res.errors.append(str(e))
+                res.confident = False
+                continue
             res.clauses.append((clause, frame, toks))
             try:
                 if frame == "SET_PROPERTY" and prev_frame == "CREATE_OBJECT" and self.vocab.compose(toks) is None \
@@ -152,7 +173,8 @@ class RuleParser:
         text = text.translate(_FA_DIGITS).replace("‌", "‌").strip()
         text = text.replace("’", "'").replace("“", '"').replace("”", '"').replace("،", ",").replace("؛", ";")
         text = text.lstrip("﻿")
-        text = apply_rewrites(text, self.rewrites)       # meanings learned into the Prolog KB
+        text = self.table.apply(text)       # reviewed synonyms + meanings learned into the Prolog KB
+        text = re.sub(r"\beach\s+(?=\d|second|minute|frame|tick|hour)", "every ", text, flags=re.I)
         text = self._english(text)
         # number lists: "position 1, 2, 3" -> "position 1 2 3" (commas would split clauses)
         text = re.sub(r"(?<=\d)\s*,\s*(?=-?\d)", " ", text)
@@ -261,6 +283,13 @@ class RuleParser:
                 c = f"add {m.group(1)} to {ref.group(1)}{ref.group(2)}"
                 ops, _ = self._create(c, self.vocab.tokenize(c), state)
                 return ops
+        # "speed hero up" / "slow it down"
+        m = re.fullmatch(r"(speed|slow)\s+(?:the\s+)?(\w+)\s+(up|down)(?:\s+(a\s+bit|a\s+little|slightly|a\s+lot|much))?", low)
+        if m and (m.group(2) in ("it", "them") or self._ent(m.group(2), state)):
+            word = "faster" if m.group(1) == "speed" else "slower"
+            who = self._ent(m.group(2), state)
+            return [Op("SET", target=None if who in (None, "it") else who,
+                       props={"__relative__": [[word, m.group(4), None, None]]})]
         # focus / select
         m = re.fullmatch(r"(?:select|focus(?:\s+on)?|choose|pick|switch\s+to|go\s+to|work\s+on)\s+(.+)", low)
         if m and self._ent(m.group(1), state) not in (None, "it"):
@@ -294,13 +323,14 @@ class RuleParser:
         if m and self._ent(m.group(1), state) and self._ent(m.group(2), state):
             return [Op("SET", target=tgt(self._ent(m.group(1), state)), props={"target": m.group(2)})]
         # "change its name to X" / "name it X"
-        m = re.fullmatch(r"(?:change|set)\s+(?:its|the|(\w+)'s)\s+name\s+to\s+[\"']?([\w؀-ۿ\-]+)[\"']?", clause.strip(), re.I)
+        m = re.fullmatch(r"(?:change|set|update)\s+(?:its|the|(\w+)'s)\s+name\s+to\s+[\"']?([\w؀-ۿ\-]+)[\"']?", clause.strip(), re.I) \
+            or re.fullmatch(r"(?:change|set|update)\s+the\s+name\s+of\s+(?:the\s+)?(\w+)\s+to\s+[\"']?([\w\-]+)[\"']?", clause.strip(), re.I)
         if m:
             who = self._ent(m.group(1), state) if m.group(1) else "it"
             return [Op("RENAME", target=tgt(who), name=m.group(2))]
         # possessives: "hero's speed should be 9", "the speed of hero is 4"
         m = re.fullmatch(r"(?:(?:set|make|change)\s+)?(?:the\s+)?(\w+)'s\s+(.+?)\s+(?:should\s+be|is|=|becomes|to)\s+(.+)", clause.strip(), re.I) \
-            or re.fullmatch(r"(?:(?:set|change)\s+)?(?:the\s+)?(.+?)\s+of\s+(?:the\s+)?(\w+)\s+(?:should\s+be|is|=|becomes|to)\s+(.+)", clause.strip(), re.I)
+            or re.fullmatch(r"(?:(?:set|change|update|make)\s+)?(?:the\s+)?(.+?)\s+of\s+(?:the\s+)?(\w+)\s+(?:should\s+be|is|=|becomes|to)\s+(.+)", clause.strip(), re.I)
         if m:
             if "'s" in clause:
                 who, key, val = m.group(1), m.group(2), m.group(3)
@@ -359,6 +389,14 @@ class RuleParser:
                                                            and words[1] not in ("on", "off") and "on" not in words and "off" not in words):
             return "ACTION_NOW"
         frame = self.vocab.compose(toks)
+        # a SHOW / BUILD / RUN word in the middle of a sentence ("clicking plus adds 1 to the value of display")
+        # is not a command; treating it as one was the most confident wrong reading
+        if frame in ("SHOW_STATE", "BUILD_SYSTEM", "RUN_SYSTEM") and toks[0].tag not in ("SHOW", "BUILD", "RUN"):
+            raise ValueError(f"no command recognised in '{clause}'")
+        # "make hero a bit slower" / "make it a lot faster": an amount, not a new object
+        if frame in ("CREATE_OBJECT", "CREATE_OR_SET") and words and words[0] in ("make", "get", "turn") and \
+                re.search(r"\ba\s+(?:bit|little|lot)\b", clause, re.I):
+            return "SET_PROPERTY"
         # "make the wall 3" / "make the arm 50 mm long": 'the' refers to something that exists
         if frame == "CREATE_OBJECT" and len(toks) > 1 and words[0] in ("make", "add", "give", "turn") \
                 and toks[1].tag == "ARTICLE" and words[1] == "the":
@@ -394,6 +432,9 @@ class RuleParser:
             if t.tag == "OBJECT" or (t.tag == "DOMAIN" and self._is_kind(t.text)):
                 return True
             if t.tag == "ARTICLE":
+                # "a bit / a little / a lot" is an amount, not an article ("make hero a bit slower")
+                if i + 1 < len(rest) and rest[i + 1].text.lower() in ("bit", "little", "lot"):
+                    return False
                 # "make the wall 3" / "make the led blink" refer to something that exists
                 return t.text.lower() in CREATE_ARTICLES
             if t.tag == "NUMBER":
@@ -700,6 +741,12 @@ class RuleParser:
             if m:
                 props[self._key(m.group(1))] = False
                 continue
+            # fuzzy: "very fast", "a bit faster", "twice as fast", "brightness to high"
+            fz = self._fuzzy_seg(low)
+            if fz:
+                key, item = fz
+                props.setdefault(key, []).append(item)
+                continue
             # quoted string with key: label "hello", text 'hi {score}', a state of "red", an owner named 'Sara'
             m = re.fullmatch(r"([A-Za-z_][\w ]*?)\s*(?:=|:|\bto\b|\bis\b|\bas\b|\bof\b|\bnamed\b|\bcalled\b)?\s*(\"[^\"]*\"|'[^']*')", seg)
             if m:
@@ -799,6 +846,29 @@ class RuleParser:
                     continue
             unknown.append(seg)
         return props
+
+    def _fuzzy_seg(self, low: str):
+        """A vague-word segment -> ('__fuzzy__', [adj, hedge, prop]) or ('__relative__', [word, amount, factor, prop])."""
+        from . import fuzzy
+        H, A = fuzzy.HEDGE_WORDS, fuzzy.AMOUNT_WORDS
+        low = re.sub(r"^(bit|little|lot)\b", r"a \1", low)          # the article was stripped as a stop word
+        m = re.fullmatch(rf"(?:({A})\s+)?([a-z]+er)(?:\s+than\s+(?:before|now))?", low)
+        if m and fuzzy.comparative(m.group(2)) and fuzzy.comparative(m.group(2))[0] != "any":
+            return "__relative__", [m.group(2), m.group(1), None, None]
+        m = re.fullmatch(r"(twice|two\s+times|three\s+times|half)\s+as\s+([a-z]+)(?:\s+as\s+(?:before|now))?", low)
+        if m and fuzzy.adjective(m.group(2)):
+            f = {"twice": 2.0, "half": 0.5}.get(m.group(1).split()[0], 3.0 if m.group(1).startswith("three") else 2.0)
+            return "__relative__", [m.group(2), None, f, None]
+        m = re.fullmatch(rf"(?:({H})\s+)?([a-z]+)", low)
+        if m and fuzzy.adjective(m.group(2)) and fuzzy.adjective(m.group(2))[0] != "any":
+            return "__fuzzy__", [m.group(2), m.group(1), None]
+        m = re.fullmatch(rf"([a-z_][\w ]*?)\s+(?:to\s+|is\s+|=\s*|at\s+)?(?:({H})\s+)?(low|high|medium|normal|average)", low)
+        if m and self._key(m.group(1)):
+            return "__fuzzy__", [m.group(3), m.group(2), self._key(m.group(1))]
+        m = re.fullmatch(rf"([a-z_][\w ]*?)\s+(?:({A})\s+)?(higher|lower)", low)
+        if m and self._key(m.group(1)):
+            return "__relative__", [m.group(3), m.group(2), None, self._key(m.group(1))]
+        return None
 
     @staticmethod
     def _key(s: str) -> str:
@@ -1160,6 +1230,7 @@ class RuleParser:
         s = " " + s.lower().strip() + " "
         s = re.sub(r"(\w+)'s\s+(\w+)", r"\1.\2", s)
         s = re.sub(r"\b(\w+)\s+of\s+(?:the\s+)?(\w+)\b", r"\2.\1", s)
+        s = self._fuzzy_cond(s)
         # "x is between 20 and 80"
         s = re.sub(r"([\w.]+)\s+(?:is\s+)?between\s+(-?[\d.]+)\s+and\s+(-?[\d.]+)",
                    r" (\1 >= \2 && \1 <= \3) ", s)
@@ -1194,6 +1265,33 @@ class RuleParser:
         s = re.sub(r"\band\b", "&&", s)
         s = re.sub(r"\bor\b", "||", s)
         return validate_expr(s)
+
+    def _fuzzy_cond(self, s: str) -> str:
+        from . import fuzzy
+        st = getattr(self, "_state", None)
+        H = fuzzy.HEDGE_WORDS
+
+        def rep(m):
+            subj, hed, adj = m.group(1), m.group(2), m.group(3)
+            if not fuzzy.adjective(adj):
+                return m.group(0)
+            ent = None
+            if st is not None:
+                head = subj.split(".")[0]
+                if self._exact_entity(head, st):
+                    ent = st.resolve(head)
+                else:
+                    prop = subj.split(".")[-1]
+                    focus = st.resolve(None)
+                    ent = focus if focus is not None and prop in focus.props else \
+                        next((e for e in st.entities.values() if prop in e.props), focus)
+            a = fuzzy.adjective(adj)
+            if a[0] != "any" and "." not in subj and ent is not None and subj == ent.name.lower():
+                subj = ident(ent.name)
+            c = fuzzy.condition(subj, adj, hed, ent)
+            return f" {c} " if c else m.group(0)
+        return re.sub(rf"\b([a-z_][\w.]*)\s+(?:is|gets|becomes|feels|seems|looks)\s+(?:({H})\s+)?([a-z]+)\b(?!\s*(?:than|to|and|or)\b)",
+                      rep, s)
 
     def _action(self, p: str, state) -> tuple[dict, str | None]:
         low = p.lower().strip()
@@ -1245,6 +1343,21 @@ class RuleParser:
         if m and owner_of(m.group(1)):
             a, _ = self._action(f"move it {m.group(2)}{m.group(3)}", state)
             return a, owner_of(m.group(1))
+        from . import fuzzy
+        m = re.fullmatch(rf"(?:make|get|turn|set)\s+(?:the\s+)?(\w+)\s+(?:({fuzzy.AMOUNT_WORDS})\s+)?([a-z]+er)", low)
+        if m and fuzzy.comparative(m.group(3)):
+            who = owner_of(m.group(1))
+            ent = state.resolve(who) if who else state.resolve(None)
+            d = fuzzy.delta_for(ent, m.group(3), m.group(2))
+            if d:
+                return {"op": "add", "prop": d[0], "value": str(d[1])}, who
+        m = re.fullmatch(rf"(?:make|get|turn|set)\s+(?:the\s+)?(\w+)\s+(?:({fuzzy.HEDGE_WORDS})\s+)?([a-z]+)", low)
+        if m and fuzzy.adjective(m.group(3)) and fuzzy.adjective(m.group(3))[0] != "any":
+            who = owner_of(m.group(1))
+            ent = state.resolve(who) if who else state.resolve(None)
+            r = fuzzy.set_value(ent, m.group(3), m.group(2))
+            if r:
+                return {"op": "set", "prop": r[0], "value": str(r[1])}, who
         m = re.fullmatch(r"(?:log|print|say)\s+([a-z_][\w.]*)", low)
         if m and m.group(1) not in ("hello", "hi", "done", "ok", "tick", "ping", "pong"):
             name = m.group(1)
@@ -1373,20 +1486,62 @@ class RuleParser:
             return validate_expr(f'"{s}"')
 
 
+class RewriteTable:
+    """Phrase rewrites (synonyms + learned meanings) applied in ONE pass over the words.
+    A dictionary keyed by the first word replaces one regex per rule, so thousands of rules stay fast."""
+
+    def __init__(self, rules=()):
+        self.rules = [r for r in rules if r and r[0]]
+        self.index: dict[str, list[tuple[list[str], list[str]]]] = {}
+        for frm, to, *_ in sorted(self.rules, key=lambda r: -len(r[0])):
+            self.index.setdefault(frm[0].lower(), []).append(([w.lower() for w in frm], list(to)))
+
+    def __len__(self):
+        return len(self.rules)
+
+    def apply(self, text: str) -> str:
+        if not self.index:
+            return text
+        parts = re.split(r"""("[^"]*"|'[^']*')""", text)
+        for i in range(0, len(parts), 2):
+            toks = re.findall(r"[A-Za-z0-9_'\-]+|\s+|[^\sA-Za-z0-9_'\-]+", parts[i])
+            words = [(j, t) for j, t in enumerate(toks) if not t.isspace()]
+            k, changed = 0, False
+            pos_out: list[str] = list(toks)
+            drop: set[int] = set()
+            while k < len(words):
+                j, t = words[k]
+                cands = self.index.get(t.lower())
+                hit = None
+                if cands:
+                    for frm, to in cands:
+                        n = len(frm)
+                        if k + n <= len(words) and all(words[k + q][1].lower() == frm[q] for q in range(n)):
+                            hit = (n, to)
+                            break
+                if hit:
+                    n, to = hit
+                    first = words[k][0]
+                    last = words[k + n - 1][0]
+                    pos_out[first] = " ".join(to)
+                    for q in range(first + 1, last + 1):
+                        drop.add(q)
+                    changed = True
+                    k += n
+                else:
+                    k += 1
+            if changed:
+                seg = "".join(t for q, t in enumerate(pos_out) if q not in drop)
+                parts[i] = re.sub(r"\s{2,}", " ", seg)
+        return "".join(parts).strip()
+
+
 def apply_rewrites(text: str, rewrites) -> str:
-    """Apply learned phrase rewrites (whole words, case-insensitive, never inside quotes)."""
+    """Apply phrase rewrites (whole words, case-insensitive, never inside quotes)."""
     if not rewrites:
         return text
-    parts = re.split(r'("[^"]*"|\'[^\']*\')', text)
-    for i in range(0, len(parts), 2):
-        seg = parts[i]
-        for frm, to, *_ in rewrites:
-            if not frm:
-                continue
-            pat = r"(?<![\w'])" + r"\s+".join(re.escape(w) for w in frm) + r"(?![\w'])"
-            seg = re.sub(pat, " ".join(to), seg, flags=re.I)
-        parts[i] = re.sub(r"\s{2,}", " ", seg)
-    return "".join(parts).strip()
+    table = rewrites if isinstance(rewrites, RewriteTable) else RewriteTable(rewrites)
+    return table.apply(text)
 
 
 LENGTH_KEYS = {"width", "height", "depth", "length", "diameter", "radius", "thickness", "wall", "size",
