@@ -84,8 +84,11 @@ class Session:
         # semantic knowledge base (Prolog): ontology, learned meanings, evidence, weighting parameters
         self.home = Path(vocab_path).parent if vocab_path else None
         self.kb = self._shared_kb if self._shared_kb is not None else Knowledge(self.home, self.modules, pretrained=True)
+        self.rules.set_synonyms(self.kb.synonyms())
         self.rules.rewrites = self.kb.rewrites()
         self.shellp = ShellParser(self.kb)
+        from . import fuzzy
+        fuzzy.KB = self.kb                                  # vague words are read from the same KB
         self.cwd = Path.cwd()
         self.confirm: tuple | None = None          # (Candidate, text) waiting for yes / no
         self.last: list[Candidate] = []            # candidates of the last sentence (for :why)
@@ -196,7 +199,7 @@ class Session:
         if pr.ops:
             f = wmod.rule_features(pr, text, self.state, self.kb, self.vocab)
             cands.append(Candidate("rules", pr.ops, f, wmod.score(f, params), text, pr))
-        sh = self.shellp.parse(apply_rewrites(text, self.rules.rewrites))
+        sh = self.shellp.parse(self.rules.table.apply(text))
         if sh:
             op, info = sh
             f = wmod.shell_features(op, info, self.cwd, self.kb)
@@ -286,6 +289,19 @@ class Session:
         self.rules.rewrites = self.kb.rewrites()
 
     def _answer_confirm(self, line: str) -> list[str]:
+        if self.confirm and self.confirm[0] == "fix":
+            from .fixer import Fixer
+            rep = self.confirm[1]
+            self.confirm = None
+            low = line.strip().lower().rstrip(".!")
+            if re.fullmatch(r"y|yes|ok|okay|sure|apply|do it|go ahead", low):
+                out = Fixer.commit(rep)
+                self._remember_fix(getattr(self, "_pending_fix_path", Path(rep.root)), rep)
+                self._last_fix_root = Path(rep.root)
+                return out
+            if re.fullmatch(r"n|no|cancel|stop|abort", low):
+                return ["  the fix was discarded - your files were not changed"]
+            return ["  (the proposed fix was discarded)"] + self.handle(line)
         cand, text, *extra = self.confirm
         self.confirm = None
         low = line.strip().lower().rstrip(".!")
@@ -573,22 +589,30 @@ class Session:
             diags = diagnose(path, run)
             out.append(f"  checked {path}: " + (f"{len(diags)} problem(s)" if diags else "no problems found by the available tools"))
             return out + [f"    {d}" for d in diags[:25]]
-        rep = Fixer(self.backend).fix(path, desc, run, focus)
+        confirm_first = self.interactive and not self.auto_yes
+        rep = Fixer(self.backend).fix(path, desc, run, focus, apply=not confirm_first)
         out += rep.lines()
+        if rep.pending:
+            self.confirm = ("fix", rep)
+            self._pending_fix_path = path
+            return out + ["? Apply this fix to your files? (yes / no)"]
         if rep.changed:
-            root = path if path.is_dir() else path.parent
-            self._last_fix_root = root
-            self._last_fix_id = len(self.state.patches) + 1
-            # fixes to generated code are remembered so a rebuild does not lose them
-            try:
-                base = root.resolve().relative_to(self.build_dir.resolve())
-                for ed in rep.edits:
-                    self.state.patches.append({"file": str(base / ed["file"]).replace("\\", "/"),
-                                               "search": ed["search"], "replace": ed["replace"],
-                                               "run": self._last_fix_id})
-            except ValueError:
-                pass
+            self._remember_fix(path, rep)
         return out
+
+    def _remember_fix(self, path: Path, rep) -> None:
+        root = path if path.is_dir() else path.parent
+        self._last_fix_root = root
+        self._last_fix_id = len(self.state.patches) + 1
+        # fixes to generated code are remembered so a rebuild does not lose them
+        try:
+            base = root.resolve().relative_to(self.build_dir.resolve())
+            for ed in rep.edits:
+                self.state.patches.append({"file": str(base / ed["file"]).replace("\\", "/"),
+                                           "search": ed["search"], "replace": ed["replace"],
+                                           "run": self._last_fix_id})
+        except ValueError:
+            pass
 
     def build(self, outdir: Path | None = None) -> list[str]:
         if not self.state.entities:
