@@ -6,6 +6,21 @@
 
 This project is an independent research prototype shared to invite feedback. It is not affiliated with or endorsed by Anthropic.
 
+## Screenshots
+
+A look at NLCL’s interface and workflow:
+
+<table>
+  <tr>
+    <td align="center"><img src="screenshots/Screenshot%202026-11-26%20024554.png" alt="NLCL screenshot 1" width="100%"></td>
+    <td align="center"><img src="screenshots/Screenshot%202026-11-26%20024937.png" alt="NLCL screenshot 2" width="100%"></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="screenshots/Screenshot%202026-11-26%20025356.png" alt="NLCL screenshot 3" width="100%"></td>
+    <td align="center"><img src="screenshots/Screenshot%202026-11-26%20025433.png" alt="NLCL screenshot 4" width="100%"></td>
+  </tr>
+</table>
+
 ## What NLCL does
 
 ```text
@@ -63,8 +78,6 @@ NLCL combines three vocabulary mechanisms:
 | Adaptive vocabulary | Teach aliases and define commands; definitions are dry-run against a copy of the state before acceptance |
 
 The interpreter applies operations to a persistent state and asks for clarification when it cannot confidently determine the intended domain or operation. The knowledge base stores ontology, learned reliability, safety rules, and learned vocabulary. The weighting model uses measurable interpretation features to estimate confidence; `:why` explains a score.
-
-Key components include:
 
 | Component | Location | Role |
 |---|---|---|
@@ -126,9 +139,9 @@ The first available backend is selected automatically. Set a model with `NLCL_<N
 
 ## Terminal assistance and safety
 
-NLCL can interpret requests such as listing files, copying or renaming files, and searching project contents. The terminal suite compares generated command effects with a reference operation in a sandbox. File-changing operations are designed to require confirmation and show the proposed changes before they are applied.
+NLCL can interpret requests such as listing files, copying or renaming files, and searching project contents. The terminal suite compares generated command effects with a reference operation in a sandbox. File-changing operations are designed to require confirmation and show proposed changes before they are applied.
 
-Code diagnostics can use installed tools such as Python, Node.js, C/C++ compilers, Icarus Verilog, Verilator, OpenSCAD, and Godot. Online code repair requires a configured language-model backend; without one, `check` can still diagnose issues.
+Code diagnostics can use installed tools such as Python, Node.js, C/C++ compilers, Icarus Verilog, Verilator, OpenSCAD, and Godot. Online code repair requires a configured language-model backend; without one, `:check` can still diagnose issues.
 
 ## Benchmark results
 
@@ -167,7 +180,7 @@ Wilson 95% confidence intervals are shown for accuracy, silent error rate, and p
 | Generated Bash and PowerShell checks passed in a sandbox | 24/44 |
 | Unconfirmed destructive file actions | 0 |
 
-The `24/44` figure is the number of shell checks that passed, not a 100% verification rate. The report notes that `llm-direct` and `nlcl+teacher` were **not run** because no language-model backend was configured. NLCL produced identical interpretations on repeated runs for all **184/184** benchmark sentences across five runs. Offline cost was zero model tokens; trained median latency was **1.05 ms** per sentence.
+The `24/44` figure is the number of shell checks that passed, not a 100% verification rate. The report notes that `llm-direct` and `nlcl+teacher` were **not run** because no language-model backend was configured. NLCL produced identical interpretations on repeated runs for all **184/184** benchmark sentences across five runs. Offline token cost was zero; trained median latency was **1.05 ms** per sentence.
 
 These are prototype benchmark results on a small, author-created corpus. They show lower silent error rates and improved refusal and calibration after training in this run, but do not establish broad real-world performance. See the [pre-registered hypotheses](bench/HYPOTHESES.md), [latest benchmark report](bench/results/report.md), and [machine-readable results](bench/results/results.json) for methodology and full details.
 
