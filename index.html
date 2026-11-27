@@ -3,107 +3,98 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#10131c">
-  <meta name="description" content="NLCL is an open-source prototype exploring natural language as a computational language, from semantic operations to code generation.">
-  <title>NLCL — Natural Language Computational Language</title>
+  <meta name="theme-color" content="#080b12">
+  <meta name="description" content="NLCL explores natural language as a computational language: instructions become semantic operations, persistent intermediate representations, and code across multiple domains.">
+  <title>NLCL — Natural Language, Compiled to Possibility</title>
   <style>
-    :root {
-      color-scheme: dark;
-      --bg: #10131c;
-      --panel: #171c28;
-      --text: #eef2ff;
-      --muted: #aab4ca;
-      --accent: #9cafff;
-      --line: #2b3447;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: radial-gradient(ellipse at 75% 0%, #26345a 0, transparent 38%), var(--bg);
-      color: var(--text);
-      line-height: 1.65;
-    }
-    a { color: var(--accent); text-underline-offset: .2em; }
-    a:hover { color: #c8d2ff; }
-    .wrap { width: min(1060px, calc(100% - 40px)); margin: 0 auto; }
-    header { padding: 22px 0; border-bottom: 1px solid var(--line); }
-    .brand { color: var(--text); font-weight: 750; letter-spacing: .04em; text-decoration: none; }
-    .hero { padding: clamp(72px, 13vw, 144px) 0 76px; }
-    .eyebrow { color: var(--accent); text-transform: uppercase; letter-spacing: .16em; font-size: .78rem; font-weight: 700; }
-    h1 { max-width: 850px; margin: 14px 0 20px; font-size: clamp(2.6rem, 7vw, 5rem); line-height: 1.04; letter-spacing: -.055em; }
-    .lead { max-width: 720px; margin: 0; color: var(--muted); font-size: clamp(1.05rem, 2.2vw, 1.25rem); }
-    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
-    .button { display: inline-block; padding: 11px 17px; border: 1px solid var(--line); border-radius: 9px; color: var(--text); text-decoration: none; font-weight: 650; }
-    .button.primary { border-color: var(--accent); background: var(--accent); color: #111728; }
-    .button:hover { transform: translateY(-1px); }
-    .flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 14px 0 78px; }
-    .step { min-height: 105px; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: #171c28dd; }
-    .step strong { display: block; margin-bottom: 6px; color: var(--text); }
-    .step span { color: var(--muted); font-size: .9rem; }
-    h2 { margin: 0 0 16px; font-size: 1.55rem; letter-spacing: -.025em; }
-    .about { max-width: 760px; padding-bottom: 70px; }
-    .about p { color: var(--muted); }
-    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding-bottom: 78px; }
-    .card { padding: 22px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; }
-    .card h2 { font-size: 1.15rem; }
-    .card p { min-height: 52px; margin: 0 0 12px; color: var(--muted); }
-    footer { padding: 24px 0 36px; border-top: 1px solid var(--line); color: var(--muted); font-size: .9rem; }
-    @media (max-width: 720px) {
-      .flow { grid-template-columns: 1fr 1fr; }
-      .step:last-child { grid-column: 1 / -1; }
-      .cards { grid-template-columns: 1fr; }
-      .card p { min-height: 0; }
-    }
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
+    :root{color-scheme:dark;--bg:#080b12;--surface:#0e1320;--surface2:#121a2a;--text:#f5f7ff;--muted:#a3aec5;--dim:#77839d;--line:rgba(185,202,255,.13);--violet:#a88bff;--cyan:#68e2df;--pink:#ff8ad7;--mono:'DM Mono',ui-monospace,monospace;--sans:'Manrope',ui-sans-serif,system-ui,sans-serif;scroll-behavior:smooth}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.7;overflow-x:hidden}body:before{content:"";position:fixed;inset:0;z-index:-3;pointer-events:none;background:radial-gradient(ellipse at 12% 8%,rgba(107,73,203,.16),transparent 34%),radial-gradient(ellipse at 88% 30%,rgba(30,143,171,.11),transparent 32%),#080b12}a{color:inherit;text-decoration:none}button{font:inherit}.shell{width:min(1160px,calc(100% - 48px));margin:auto}.mono,.eyebrow,.tag,.nav-link,.terminal-label{font-family:var(--mono)}.eyebrow{font-size:.76rem;letter-spacing:.13em;text-transform:uppercase;color:var(--cyan)}
+    .topbar{position:sticky;top:0;z-index:20;border-bottom:1px solid rgba(185,202,255,.1);background:rgba(8,11,18,.72);backdrop-filter:blur(18px)}.nav{height:74px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;gap:12px;align-items:center;font-size:1.05rem;font-weight:800;letter-spacing:.04em}.brand-mark{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--violet),var(--cyan));color:#081019;font-size:.86rem;box-shadow:0 0 25px #9e84ff44}.nav-links{display:flex;gap:28px;align-items:center}.nav-link{font-size:.75rem;color:var(--muted);transition:color .2s}.nav-link:hover{color:var(--text)}.nav-cta{padding:9px 14px;border:1px solid var(--line);border-radius:8px;font-size:.8rem;color:var(--text)}
+    .hero{position:relative;min-height:690px;display:grid;grid-template-columns:1.03fr .97fr;align-items:center;gap:24px;padding:90px 0 84px}.hero:after{content:"";position:absolute;z-index:-1;width:550px;height:550px;right:4%;top:12%;border-radius:50%;background:radial-gradient(circle,#845eff1b,transparent 68%);filter:blur(10px);animation:breathe 7s ease-in-out infinite alternate}.hero-copy{position:relative;z-index:2}.hero h1{max-width:740px;margin:20px 0 23px;font-size:clamp(3.1rem,6.6vw,6.2rem);line-height:.99;letter-spacing:-.075em;font-weight:800}.gradient-text{color:transparent;background:linear-gradient(100deg,#eeeaff 5%,#b49aff 43%,#6fe0db 88%);background-clip:text;-webkit-background-clip:text}.lead{max-width:630px;color:var(--muted);font-size:1.08rem;line-height:1.85}.actions{display:flex;flex-wrap:wrap;gap:12px;margin:30px 0 26px}.button{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:12px 17px;border-radius:9px;border:1px solid var(--line);font-size:.87rem;font-weight:700;transition:transform .25s,border-color .25s,box-shadow .25s}.button:hover{transform:translateY(-3px);border-color:#a88bff99;box-shadow:0 10px 32px #8b6aff20}.button.primary{color:#0a0c15;background:linear-gradient(110deg,#c1a8ff,#7be3dc);border:0}.hero-note{font-size:.78rem;color:var(--dim)}.hero-note span{color:var(--cyan)}
+    .visual{position:relative;min-height:470px;display:grid;place-items:center;perspective:1000px}.orb{position:absolute;width:350px;height:350px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#c6b5ffdd 0,#8270e5 16%,#37336d 37%,#101623 68%,transparent 72%);box-shadow:inset -28px -22px 60px #060811aa,0 0 100px #9a7aff20;animation:float 7s ease-in-out infinite}.orb:before,.orb:after{content:"";position:absolute;inset:-28px;border:1px solid #ac9aff36;border-radius:50%;transform:rotateX(68deg) rotateZ(-24deg)}.orb:after{inset:-60px;transform:rotateX(68deg) rotateZ(28deg);border-color:#66dedb26}.orbit{position:absolute;width:440px;height:440px;border:1px solid #c0b0ff25;border-radius:50%;transform:rotateX(70deg) rotateZ(-24deg);animation:orbit 20s linear infinite}.orbit:before,.orbit:after{content:"";position:absolute;width:10px;height:10px;border-radius:50%;background:var(--cyan);box-shadow:0 0 22px var(--cyan)}.orbit:before{top:12%;left:17%}.orbit:after{right:12%;bottom:18%;background:var(--pink);box-shadow:0 0 22px var(--pink)}.code-card{position:absolute;right:1%;bottom:7%;width:min(340px,88%);padding:19px;border:1px solid #bbc6ff2b;border-radius:14px;background:linear-gradient(145deg,#141b2beF,#0a0e17f2);box-shadow:0 28px 80px #0009;transform:rotateY(-8deg) rotateX(3deg);animation:cardfloat 6s ease-in-out infinite}.window-dots{display:flex;gap:6px;margin-bottom:17px}.window-dots i{width:7px;height:7px;border-radius:50%;background:#ff7185}.window-dots i:nth-child(2){background:#ffc96f}.window-dots i:nth-child(3){background:#69debd}.code-card .mono{font-size:.75rem;line-height:2;color:#bcc8e2}.code-card .key{color:#b89aff}.code-card .val{color:#79e0cf}.code-card .comment{color:#77839d}.float-tag{position:absolute;z-index:2;padding:8px 11px;border:1px solid var(--line);border-radius:8px;background:#111726cc;color:#dce4fa;font: .68rem var(--mono);backdrop-filter:blur(10px);animation:tagfloat 5s ease-in-out infinite}.float-tag.t1{top:12%;left:4%}.float-tag.t2{top:28%;right:0;animation-delay:-2s}.float-tag.t3{bottom:11%;left:0;animation-delay:-3s}
+    .ticker-wrap{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#0d111bcc}.ticker{display:flex;width:max-content;animation:marquee 35s linear infinite;padding:15px 0}.ticker span{font: .72rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#b1bad0;padding:0 28px;white-space:nowrap}.ticker b{color:var(--cyan);font-weight:400;margin-right:24px}
+    .section{padding:112px 0}.section-head{max-width:740px;margin-bottom:45px}.section h2{margin:13px 0 15px;font-size:clamp(2rem,4vw,3.55rem);line-height:1.1;letter-spacing:-.06em}.section-intro{max-width:700px;color:var(--muted);font-size:1rem}.workflow{position:relative;display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.workflow:before{content:"";position:absolute;top:27px;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,#9d8aff77,#69dedb77,transparent)}.stage{position:relative;padding:0 17px 20px 0}.stage-num{position:relative;z-index:1;display:grid;place-items:center;width:54px;height:54px;margin-bottom:20px;border:1px solid #a68cff66;border-radius:16px;background:#121628;color:var(--cyan);font: .83rem var(--mono);box-shadow:0 0 22px #8f78ff18}.stage h3{margin:0 0 8px;font-size:1rem}.stage p{margin:0;color:var(--muted);font-size:.83rem}
+    .demo{position:relative;overflow:hidden;padding:32px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(135deg,#101726,#0b0f18 70%);box-shadow:0 28px 90px #0004}.demo:before{content:"";position:absolute;right:-100px;top:-150px;width:340px;height:340px;border-radius:50%;background:#8c68ff18;filter:blur(20px)}.demo-grid{position:relative;display:grid;grid-template-columns:1fr 55px 1fr;gap:18px;align-items:center}.demo-pane{min-height:240px;padding:22px;border:1px solid var(--line);border-radius:13px;background:#0a0e17}.terminal-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:23px;color:var(--dim);font-size:.68rem;letter-spacing:.09em;text-transform:uppercase}.live-dot{width:7px;height:7px;border-radius:50%;background:#70e1c0;box-shadow:0 0 12px #70e1c0;animation:pulse 1.8s infinite}.prompt{margin:0 0 14px;color:#dce5fc;font-size:.93rem}.prompt:before{content:"> ";color:var(--violet)}.hint{color:var(--dim);font: .72rem var(--mono)}.arrow-flow{color:var(--cyan);font-size:1.7rem;text-align:center;animation:nudge 1.6s ease-in-out infinite}.ir-line{font: .73rem var(--mono);color:#bac7e0;line-height:2}.ir-line b{color:var(--violet);font-weight:500}.ir-line em{color:var(--cyan);font-style:normal}.ir-line i{color:#ffc77a;font-style:normal}.demo-foot{position:relative;margin:20px 0 0;color:var(--dim);font-size:.75rem}
+    .gallery{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}.gallery-main,.gallery-stack figure{position:relative;margin:0;overflow:hidden;border:1px solid var(--line);border-radius:16px;background:#111725}.gallery-main img,.gallery-stack img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .8s cubic-bezier(.2,.8,.2,1),filter .5s}.gallery-main:hover img,.gallery-stack figure:hover img{transform:scale(1.045);filter:saturate(1.13)}.gallery-main{min-height:430px}.gallery-main img{position:absolute;inset:0}.gallery-stack{display:grid;grid-template-rows:1fr 1fr;gap:18px;min-height:430px}.gallery-stack figure{min-height:205px}.gallery-stack img{position:absolute;inset:0}.gallery-main:after,.gallery-stack figure:after{content:"";position:absolute;inset:35% 0 0;background:linear-gradient(transparent,#070a11dd);pointer-events:none}.caption{position:absolute;z-index:1;left:20px;bottom:15px;color:#f5f7ff;font-size:.82rem;font-weight:700}.gallery-note{margin-top:14px;color:var(--dim);font-size:.77rem}
+    .feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.feature{position:relative;overflow:hidden;min-height:220px;padding:24px;border:1px solid var(--line);border-radius:15px;background:linear-gradient(145deg,#121a29,#0c1019);transition:transform .3s,border-color .3s}.feature:hover{transform:translateY(-6px);border-color:#a78cff66}.feature:after{content:"";position:absolute;width:120px;height:120px;right:-42px;bottom:-50px;border-radius:50%;background:#8a6eff18;filter:blur(3px);transition:transform .5s}.feature:hover:after{transform:scale(1.7)}.feature-icon{display:grid;place-items:center;width:42px;height:42px;margin-bottom:19px;border:1px solid #a88bff44;border-radius:12px;color:var(--cyan);font-size:1.15rem}.feature h3{margin:0 0 8px;font-size:1rem}.feature p{margin:0;color:var(--muted);font-size:.85rem}
+    .domains{display:flex;flex-wrap:wrap;gap:10px}.domain{display:flex;align-items:center;gap:10px;padding:12px 15px;border:1px solid var(--line);border-radius:10px;background:#101522;color:#e3e9f8;font-size:.81rem;transition:transform .25s,border-color .25s}.domain:hover{transform:translateY(-3px);border-color:#72dedb77}.domain i{color:var(--cyan);font: .7rem var(--mono);font-style:normal}
+    .example{display:grid;grid-template-columns:.8fr 1.2fr;gap:40px;align-items:center;padding:35px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(115deg,#12192a,#0c1019)}.example-copy p{color:var(--muted);font-size:.9rem}.example-code{padding:20px;border:1px solid var(--line);border-radius:12px;background:#080b12;font: .75rem/2 var(--mono);color:#c3cee4;overflow:auto}.example-code .op{color:#b59aff}.example-code .str{color:#75ddce}.example-code .num{color:#ffc77a}
+    .limits{display:grid;grid-template-columns:1fr 1fr;gap:14px}.limit{display:flex;gap:14px;padding:20px;border:1px solid var(--line);border-radius:12px;background:#0e1320}.limit-mark{flex:none;color:var(--pink);font:1rem var(--mono)}.limit p{margin:0;color:var(--muted);font-size:.83rem}.cta{position:relative;overflow:hidden;padding:55px;border:1px solid #a88bff44;border-radius:20px;background:radial-gradient(ellipse at 80% 10%,#55cfcf1c,transparent 40%),linear-gradient(120deg,#17152b,#101625)}.cta:after{content:"NLCL";position:absolute;right:4%;bottom:-70px;color:#ffffff06;font-size:clamp(7rem,20vw,17rem);font-weight:800;letter-spacing:-.1em;line-height:1}.cta h2{position:relative;z-index:1;max-width:720px;margin:12px 0 15px;font-size:clamp(2rem,4.2vw,3.8rem);line-height:1.1;letter-spacing:-.06em}.cta p{position:relative;z-index:1;max-width:620px;color:var(--muted)}.cta .actions{position:relative;z-index:1}.footer{padding:28px 0 40px;border-top:1px solid var(--line);color:var(--dim);font-size:.78rem}.footer-inner{display:flex;justify-content:space-between;gap:20px;align-items:center}.footer a{color:var(--muted)}.reveal{opacity:0;transform:translateY(25px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.8,.2,1)}.reveal.is-visible{opacity:1;transform:translateY(0)}.delay-1{transition-delay:.12s}.delay-2{transition-delay:.24s}.delay-3{transition-delay:.36s}
+    #particles{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.48;z-index:0}.hero-copy,.visual{z-index:1}@keyframes float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-15px) rotate(3deg)}}@keyframes cardfloat{0%,100%{transform:translateY(0) rotateY(-8deg) rotateX(3deg)}50%{transform:translateY(-10px) rotateY(-5deg) rotateX(1deg)}}@keyframes tagfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-11px)}}@keyframes orbit{to{transform:rotateX(70deg) rotateZ(336deg)}}@keyframes breathe{to{transform:scale(1.2);opacity:.65}}@keyframes marquee{to{transform:translateX(-50%)}}@keyframes pulse{50%{opacity:.35;box-shadow:0 0 3px #70e1c0}}@keyframes nudge{50%{transform:translateX(7px)}}
+    @media(max-width:900px){.hero{grid-template-columns:1fr;padding-top:74px}.hero-copy{max-width:760px}.visual{min-height:440px}.hero h1{max-width:780px}.workflow{grid-template-columns:repeat(3,1fr);row-gap:30px}.workflow:before{display:none}.gallery{grid-template-columns:1fr}.gallery-main{min-height:400px}.gallery-stack{grid-template-columns:1fr 1fr;grid-template-rows:1fr;min-height:230px}.gallery-stack figure{min-height:230px}}
+    @media(max-width:640px){.shell{width:min(100% - 34px,1160px)}.nav{height:64px}.nav-links{gap:12px}.nav-link{display:none}.nav-cta{font-size:.72rem;padding:8px 10px}.hero{padding:67px 0 48px;gap:0}.hero h1{font-size:clamp(3rem,15vw,5rem)}.lead{font-size:.97rem}.visual{min-height:360px;transform:scale(.88);margin:-12px -20px}.orb{width:280px;height:280px}.orbit{width:355px;height:355px}.code-card{right:0;bottom:2%;width:300px}.float-tag.t2{right:-2%}.section{padding:78px 0}.section-head{margin-bottom:30px}.workflow{grid-template-columns:1fr 1fr;gap:22px 14px}.stage{padding:0}.stage-num{width:45px;height:45px;margin-bottom:13px}.stage:last-child{grid-column:1/-1}.demo{padding:16px}.demo-grid{grid-template-columns:1fr;gap:12px}.demo-pane{min-height:auto;padding:17px}.arrow-flow{transform:rotate(90deg);height:26px}.gallery-main{min-height:280px}.gallery-stack{gap:10px;min-height:150px}.gallery-stack figure{min-height:150px}.caption{left:13px;bottom:10px;font-size:.72rem}.feature-grid{grid-template-columns:1fr}.feature{min-height:auto}.feature-grid .feature{padding:20px}.example{grid-template-columns:1fr;padding:22px;gap:18px}.limits{grid-template-columns:1fr}.cta{padding:30px 22px}.footer-inner{align-items:flex-start;flex-direction:column;gap:8px}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.reveal{opacity:1;transform:none}#particles{display:none}}
   </style>
 </head>
 <body>
-  <header>
-    <div class="wrap"><a class="brand" href="./">NLCL</a></div>
-  </header>
-  <main class="wrap">
-    <section class="hero">
-      <div class="eyebrow">An open-source research prototype</div>
-      <h1>What if natural language could be the programming language?</h1>
-      <p class="lead">NLCL turns instructions into semantic operations, applies them to a persistent intermediate representation, and generates code for different domains.</p>
-      <div class="actions">
-        <a class="button primary" href="https://github.com/anonymous14725/nlcl">Explore the repository</a>
-        <a class="button" href="https://github.com/anonymous14725/nlcl/blob/main/README.md">Read the documentation</a>
-      </div>
-    </section>
-
-    <section aria-label="NLCL workflow" class="flow">
-      <div class="step"><strong>01 · Instruct</strong><span>Describe what you want in natural language.</span></div>
-      <div class="step"><strong>02 · Interpret</strong><span>Resolve words into semantic operations.</span></div>
-      <div class="step"><strong>03 · Represent</strong><span>Review changes in a persistent IR.</span></div>
-      <div class="step"><strong>04 · Generate</strong><span>Target a domain-specific implementation.</span></div>
-      <div class="step"><strong>05 · Build</strong><span>Run, build, or simulate the result.</span></div>
-    </section>
-
-    <section class="about">
-      <h2>One intent, many domains</h2>
-      <p>The prototype explores a workflow where sentences become semantic tokens, tokens become computational structures, and those structures can produce outputs for apps, Python, games, embedded systems, hardware, C++, 3D, and CAD. The core works offline with Python’s standard library; optional language-model backends can extend interpretation.</p>
-      <p>NLCL is an independent project shared to invite research feedback. It is not affiliated with or endorsed by Anthropic.</p>
-    </section>
-
-    <section class="cards" aria-label="Project links">
-      <article class="card">
-        <h2>Get started</h2>
-        <p>Install nothing extra to try the offline Python prototype.</p>
-        <a href="https://github.com/anonymous14725/nlcl#quick-start">Quick start →</a>
-      </article>
-      <article class="card">
-        <h2>Research proposal</h2>
-        <p>Read the concept, goals, and broader research motivation.</p>
-        <a href="https://github.com/anonymous14725/nlcl/blob/main/PROPOSAL.md">Open proposal →</a>
-      </article>
-      <article class="card">
-        <h2>See it in action</h2>
-        <p>Browse interface screenshots and example workflows.</p>
-        <a href="https://github.com/anonymous14725/nlcl#screenshots">View screenshots →</a>
-      </article>
-    </section>
+  <header class="topbar"><div class="shell nav"><a class="brand" href="#top" aria-label="NLCL home"><span class="brand-mark">N</span><span>NLCL</span></a><nav class="nav-links" aria-label="Main navigation"><a class="nav-link" href="#how-it-works">How it works</a><a class="nav-link" href="#screenshots">Screenshots</a><a class="nav-link" href="#domains">Domains</a><a class="nav-cta" href="https://github.com/anonymous14725/nlcl">GitHub ↗</a></nav></div></header>
+  <main id="top">
+    <section class="shell hero"><canvas id="particles" aria-hidden="true"></canvas><div class="hero-copy">
+      <div class="eyebrow">A new way to think about code</div>
+      <h1>What if words could <span class="gradient-text">build worlds?</span></h1>
+      <p class="lead"><strong>NLCL</strong> is an open-source research prototype exploring natural language as a computational language. Instructions become semantic operations, operations shape a persistent intermediate representation, and that representation can generate code across multiple domains.</p>
+      <div class="actions"><a class="button primary" href="https://github.com/anonymous14725/nlcl">Explore the project <span>↗</span></a><a class="button" href="https://github.com/anonymous14725/nlcl#quick-start">Get started <span>→</span></a></div>
+      <div class="hero-note"><span>●</span> Offline-first core · Python standard library · Open source</div>
+    </div><div class="visual" aria-label="Animated visualization of language becoming code"><div class="orb"></div><div class="orbit"></div><div class="float-tag t1">meaning → structure</div><div class="float-tag t2">persistent IR · v1</div><div class="float-tag t3">CREATE · CONNECT · BUILD</div><div class="code-card"><div class="window-dots"><i></i><i></i><i></i></div><div class="mono"><span class="comment">// from intention to structure</span><br><span class="key">CREATE</span>(domain=<span class="val">GAME</span>,<br>&nbsp;&nbsp;type=<span class="val">"hero"</span>,<br>&nbsp;&nbsp;properties={<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="val">"health"</span>: <span class="val">100</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="val">"movable"</span>: <span class="val">true</span><br>&nbsp;&nbsp;})</div></div></div></section>
+    <div class="ticker-wrap" aria-hidden="true"><div class="ticker"><span><b>✳</b>Natural language</span><span><b>✳</b>Semantic tokens</span><span><b>✳</b>Persistent state</span><span><b>✳</b>Universal IR</span><span><b>✳</b>Code generation</span><span><b>✳</b>Build · run · simulate</span><span><b>✳</b>Natural language</span><span><b>✳</b>Semantic tokens</span><span><b>✳</b>Persistent state</span><span><b>✳</b>Universal IR</span><span><b>✳</b>Code generation</span><span><b>✳</b>Build · run · simulate</span></div></div>
+    <section class="section shell" id="how-it-works"><div class="section-head reveal"><div class="eyebrow">From sentence to system</div><h2>One thought.<br><span class="gradient-text">A complete pipeline.</span></h2><p class="section-intro">NLCL treats language as more than a chat interface. A request is interpreted as candidate operations, checked against state, then represented in a reusable form before code is generated.</p></div><div class="workflow"><article class="stage reveal"><div class="stage-num">01</div><h3>Say what you mean</h3><p>Describe an object, behavior, connection, or system in everyday English.</p></article><article class="stage reveal delay-1"><div class="stage-num">02</div><h3>Interpret intent</h3><p>Map familiar sentence patterns to semantic tokens and candidate meanings.</p></article><article class="stage reveal delay-2"><div class="stage-num">03</div><h3>Preview the change</h3><p>Dry-run operations against a copy of the persistent state before acceptance.</p></article><article class="stage reveal delay-1"><div class="stage-num">04</div><h3>Keep a universal IR</h3><p>Store the result as a domain-aware intermediate representation you can inspect.</p></article><article class="stage reveal delay-2"><div class="stage-num">05</div><h3>Generate and build</h3><p>Use a domain module to generate code, then build, run, or simulate it.</p></article></div></section>
+    <section class="section shell" style="padding-top:10px"><div class="section-head reveal"><div class="eyebrow">A tiny example</div><h2>English in.<br><span class="gradient-text">Structure out.</span></h2><p class="section-intro">The same intent can be explored conversationally, inspected as an IR operation, and carried forward into a domain-specific generator.</p></div><div class="demo reveal"><div class="demo-grid"><div class="demo-pane"><div class="terminal-label"><span>Natural-language instruction</span><span class="live-dot"></span></div><p class="prompt">Create a game hero with 100 health and make it movable.</p><div class="hint">A familiar sentence. A concrete intent.</div></div><div class="arrow-flow" aria-hidden="true">⟶</div><div class="demo-pane"><div class="terminal-label"><span>Universal intermediate representation</span><span class="mono" style="font-size:.65rem;color:var(--cyan)">DRY-RUN READY</span></div><div class="ir-line"><b>CREATE</b>(domain=<em>GAME</em>,<br>&nbsp; type=<em>hero</em>,<br>&nbsp; properties={<br>&nbsp;&nbsp; <i>"health"</i>: <em>100</em>,<br>&nbsp;&nbsp; <i>"movable"</i>: <em>true</em><br>&nbsp;})</div></div></div><p class="demo-foot">Illustrative example based on NLCL’s operation model. The prototype supports common patterns, not unrestricted English.</p></div></section>
+    <section class="section shell" id="screenshots"><div class="section-head reveal"><div class="eyebrow">Inside the prototype</div><h2>See the ideas<br><span class="gradient-text">taking shape.</span></h2><p class="section-intro">A first look at NLCL’s interface and workflow. These screenshots are served directly from the project repository.</p></div><div class="gallery reveal"><figure class="gallery-main"><img src="screenshots/Screenshot%202026-11-26%20024554.png" alt="NLCL application interface and project workflow" loading="lazy"><figcaption class="caption">The NLCL workspace</figcaption></figure><div class="gallery-stack"><figure><img src="screenshots/Screenshot%202026-11-26%20024937.png" alt="NLCL prototype interface screenshot" loading="lazy"><figcaption class="caption">Working with the prototype</figcaption></figure><figure><img src="screenshots/Screenshot%202026-11-26%20025356.png" alt="NLCL interface showing a generated result" loading="lazy"><figcaption class="caption">From intent to output</figcaption></figure></div></div><p class="gallery-note">More images and project details are available in the <a href="https://github.com/anonymous14725/nlcl#screenshots" style="color:var(--cyan)">repository screenshots</a>.</p></section>
+    <section class="section shell" style="padding-top:10px"><div class="section-head reveal"><div class="eyebrow">Built to explore</div><h2>Not just a parser.<br><span class="gradient-text">A computational model.</span></h2></div><div class="feature-grid"><article class="feature reveal"><div class="feature-icon">⌘</div><h3>Semantic operations</h3><p>Atomic tokens such as <code>CREATE</code>, <code>DELETE</code>, and <code>CONNECT</code> can combine into higher-level operations.</p></article><article class="feature reveal delay-1"><div class="feature-icon">◈</div><h3>Persistent intermediate representation</h3><p>Interpretations update a lasting state that can be inspected, built on, and translated into different targets.</p></article><article class="feature reveal delay-2"><div class="feature-icon">⤳</div><h3>Dry-run before acceptance</h3><p>Vocabulary definitions are checked against a copy of state before they are accepted, helping keep changes inspectable.</p></article><article class="feature reveal"><div class="feature-icon">⌁</div><h3>Adaptive vocabulary</h3><p>Teach aliases and define commands to extend the language with domain knowledge and custom patterns.</p></article><article class="feature reveal delay-1"><div class="feature-icon">◎</div><h3>Offline-first core</h3><p>The core runs with Python’s standard library. The rule-based English parser works without a configured model backend.</p></article><article class="feature reveal delay-2"><div class="feature-icon">⛭</div><h3>Plugin-based domains</h3><p>Modules can add specialized generators and connect entities through contracts such as HTTP, MQTT, serial, SPI, or I²C.</p></article></div></section>
+    <section class="section shell" id="domains" style="padding-top:15px"><div class="section-head reveal"><div class="eyebrow">One representation · many destinations</div><h2>Choose a domain.<br><span class="gradient-text">Keep the intent.</span></h2><p class="section-intro">NLCL’s modules explore how a shared representation can generate very different kinds of output.</p></div><div class="domains reveal"><a class="domain" href="https://github.com/anonymous14725/nlcl"><i>01</i> Apps · Tkinter & PWA</a><a class="domain" href="https://github.com/anonymous14725/nlcl"><i>02</i> Python</a><a class="domain" href="https://github.com/anonymous14725/nlcl"><i>03</i> Games · Unity & Godot</a><a class="domain" href="https://github.com/anonymous14725/nlcl"><i>04</i> Embedded · Arduino</a><a class="domain" href="https://github.com/anonymous14725/nlcl"><i>05</i> Hardware · Verilog</a><a class="domain" href="https://github.com/anonymous14725/nlcl"><i>06</i> C++</a><a class="domain" href="https://github.com/anonymous14725/nlcl"><i>07</i> 3D · Three.js & Blender</a><a class="domain" href="https://github.com/anonymous14725/nlcl"><i>08</i> CAD · OpenSCAD</a></div></section>
+    <section class="section shell" style="padding-top:15px"><div class="example reveal"><div class="example-copy"><div class="eyebrow">The shape of an intent</div><h2 style="margin:12px 0;font-size:clamp(1.8rem,3vw,2.7rem);line-height:1.12;letter-spacing:-.06em">A living state,<br>not a one-off answer.</h2><p>An instruction can become a structured operation, stay part of the project state, and inform what comes next. Here’s the style of IR shown in the project documentation.</p><a class="button" href="https://github.com/anonymous14725/nlcl#what-nlcl-does">Explore the README →</a></div><div class="example-code"><span class="op">CREATE</span>(domain=<span class="str">GAME</span>, type=<span class="str">object</span>,<br>&nbsp; properties={<span class="str">"health"</span>: <span class="num">100</span>, <span class="str">"movable"</span>: <span class="num">true</span>})<br><span class="op">BEHAVIOR</span>(target=<span class="str">hero</span>, behavior={<br>&nbsp; <span class="str">"on"</span>: <span class="str">"update"</span>,<br>&nbsp; <span class="str">"if"</span>: <span class="str">"health &lt; 1"</span>,<br>&nbsp; <span class="str">"do"</span>: [{<span class="str">"op"</span>: <span class="str">"destroy"</span>}]<br>})<br><span class="op">CONNECT</span>(target=<span class="str">temp</span>, dst=<span class="str">monitor</span>,<br>&nbsp; via=<span class="str">http</span>, properties={<span class="str">"interval_ms"</span>: <span class="num">2000</span>})</div></div></section>
+    <section class="section shell" style="padding-top:15px"><div class="section-head reveal"><div class="eyebrow">An honest prototype</div><h2>Exploring a direction,<br><span class="gradient-text">not claiming magic.</span></h2><p class="section-intro">NLCL is an early research prototype. Its limits matter as much as its ambition.</p></div><div class="limits"><div class="limit reveal"><span class="limit-mark">↗</span><p>The offline parser supports common English sentence patterns; it is not unrestricted natural-language understanding.</p></div><div class="limit reveal delay-1"><span class="limit-mark">↗</span><p>Persian and other non-Latin input require an online language-model backend.</p></div><div class="limit reveal"><span class="limit-mark">↗</span><p>Generated code is a starting point, not a verified production product; toolchains may be needed for non-Python targets.</p></div><div class="limit reveal delay-1"><span class="limit-mark">↗</span><p>Benchmark results are preliminary and based on a small, author-created corpus.</p></div></div></section>
+    <section class="shell" style="padding-bottom:100px"><div class="cta reveal"><div class="eyebrow">Open source · independent research</div><h2>Help explore what programming could become.</h2><p>Try the prototype, inspect the implementation, or share feedback on the idea. NLCL is independent and is not affiliated with or endorsed by Anthropic.</p><div class="actions"><a class="button primary" href="https://github.com/anonymous14725/nlcl">Visit the GitHub repository ↗</a><a class="button" href="https://github.com/anonymous14725/nlcl/blob/main/PROPOSAL.md">Read the proposal</a></div></div></section>
   </main>
-  <footer><div class="wrap">Open source under the MIT License · <a href="https://github.com/anonymous14725/nlcl">GitHub repository</a></div></footer>
+  <footer class="footer"><div class="shell footer-inner"><span>© NLCL · Released under the MIT License</span><span><a href="https://github.com/anonymous14725/nlcl">GitHub</a> · Concept and design goals by M. M. Shamshiri (2019)</span></div></footer>
+  <script>
+    (() => {
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const revealItems = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window && !reduceMotion) {
+        const observer = new IntersectionObserver((entries, current) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              current.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.13 });
+        revealItems.forEach(item => observer.observe(item));
+      } else revealItems.forEach(item => item.classList.add('is-visible'));
+
+      const canvas = document.getElementById('particles');
+      const context = canvas && canvas.getContext('2d');
+      if (!context || reduceMotion) return;
+      let width = 0, height = 0, points = [];
+      const resize = () => {
+        const rect = canvas.getBoundingClientRect();
+        const ratio = Math.min(window.devicePixelRatio || 1, 1.5);
+        width = rect.width; height = rect.height;
+        canvas.width = width * ratio; canvas.height = height * ratio;
+        context.setTransform(ratio, 0, 0, ratio, 0, 0);
+        const count = Math.min(64, Math.max(24, Math.round(width / 18)));
+        points = Array.from({ length: count }, () => ({ x: Math.random() * width, y: Math.random() * height, vx: (Math.random() - .5) * .22, vy: (Math.random() - .5) * .22 }));
+      };
+      let frame;
+      const draw = () => {
+        context.clearRect(0, 0, width, height);
+        for (let i = 0; i < points.length; i++) {
+          const p = points[i]; p.x += p.vx; p.y += p.vy;
+          if (p.x < 0 || p.x > width) p.vx *= -1;
+          if (p.y < 0 || p.y > height) p.vy *= -1;
+          context.beginPath(); context.arc(p.x, p.y, 1.25, 0, Math.PI * 2); context.fillStyle = '#b9a9ff88'; context.fill();
+          for (let j = i + 1; j < points.length; j++) {
+            const q = points[j], dx = p.x - q.x, dy = p.y - q.y, distance = Math.hypot(dx, dy);
+            if (distance < 115) { context.beginPath(); context.moveTo(p.x, p.y); context.lineTo(q.x, q.y); context.strokeStyle = `rgba(138,170,231,${(1 - distance / 115) * .13})`; context.stroke(); }
+          }
+        }
+        frame = requestAnimationFrame(draw);
+      };
+      resize(); draw();
+      window.addEventListener('resize', () => { cancelAnimationFrame(frame); resize(); draw(); }, { passive: true });
+    })();
+  </script>
 </body>
 </html>
