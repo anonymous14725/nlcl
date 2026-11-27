@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10131c">
+  <meta name="description" content="NLCL is an open-source prototype exploring natural language as a computational language, from semantic operations to code generation.">
+  <title>NLCL — Natural Language Computational Language</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #10131c;
+      --panel: #171c28;
+      --text: #eef2ff;
+      --muted: #aab4ca;
+      --accent: #9cafff;
+      --line: #2b3447;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(ellipse at 75% 0%, #26345a 0, transparent 38%), var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+    }
+    a { color: var(--accent); text-underline-offset: .2em; }
+    a:hover { color: #c8d2ff; }
+    .wrap { width: min(1060px, calc(100% - 40px)); margin: 0 auto; }
+    header { padding: 22px 0; border-bottom: 1px solid var(--line); }
+    .brand { color: var(--text); font-weight: 750; letter-spacing: .04em; text-decoration: none; }
+    .hero { padding: clamp(72px, 13vw, 144px) 0 76px; }
+    .eyebrow { color: var(--accent); text-transform: uppercase; letter-spacing: .16em; font-size: .78rem; font-weight: 700; }
+    h1 { max-width: 850px; margin: 14px 0 20px; font-size: clamp(2.6rem, 7vw, 5rem); line-height: 1.04; letter-spacing: -.055em; }
+    .lead { max-width: 720px; margin: 0; color: var(--muted); font-size: clamp(1.05rem, 2.2vw, 1.25rem); }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+    .button { display: inline-block; padding: 11px 17px; border: 1px solid var(--line); border-radius: 9px; color: var(--text); text-decoration: none; font-weight: 650; }
+    .button.primary { border-color: var(--accent); background: var(--accent); color: #111728; }
+    .button:hover { transform: translateY(-1px); }
+    .flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 14px 0 78px; }
+    .step { min-height: 105px; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: #171c28dd; }
+    .step strong { display: block; margin-bottom: 6px; color: var(--text); }
+    .step span { color: var(--muted); font-size: .9rem; }
+    h2 { margin: 0 0 16px; font-size: 1.55rem; letter-spacing: -.025em; }
+    .about { max-width: 760px; padding-bottom: 70px; }
+    .about p { color: var(--muted); }
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding-bottom: 78px; }
+    .card { padding: 22px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; }
+    .card h2 { font-size: 1.15rem; }
+    .card p { min-height: 52px; margin: 0 0 12px; color: var(--muted); }
+    footer { padding: 24px 0 36px; border-top: 1px solid var(--line); color: var(--muted); font-size: .9rem; }
+    @media (max-width: 720px) {
+      .flow { grid-template-columns: 1fr 1fr; }
+      .step:last-child { grid-column: 1 / -1; }
+      .cards { grid-template-columns: 1fr; }
+      .card p { min-height: 0; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap"><a class="brand" href="./">NLCL</a></div>
+  </header>
+  <main class="wrap">
+    <section class="hero">
+      <div class="eyebrow">An open-source research prototype</div>
+      <h1>What if natural language could be the programming language?</h1>
+      <p class="lead">NLCL turns instructions into semantic operations, applies them to a persistent intermediate representation, and generates code for different domains.</p>
+      <div class="actions">
+        <a class="button primary" href="https://github.com/anonymous14725/nlcl">Explore the repository</a>
+        <a class="button" href="https://github.com/anonymous14725/nlcl/blob/main/README.md">Read the documentation</a>
+      </div>
+    </section>
+
+    <section aria-label="NLCL workflow" class="flow">
+      <div class="step"><strong>01 · Instruct</strong><span>Describe what you want in natural language.</span></div>
+      <div class="step"><strong>02 · Interpret</strong><span>Resolve words into semantic operations.</span></div>
+      <div class="step"><strong>03 · Represent</strong><span>Review changes in a persistent IR.</span></div>
+      <div class="step"><strong>04 · Generate</strong><span>Target a domain-specific implementation.</span></div>
+      <div class="step"><strong>05 · Build</strong><span>Run, build, or simulate the result.</span></div>
+    </section>
+
+    <section class="about">
+      <h2>One intent, many domains</h2>
+      <p>The prototype explores a workflow where sentences become semantic tokens, tokens become computational structures, and those structures can produce outputs for apps, Python, games, embedded systems, hardware, C++, 3D, and CAD. The core works offline with Python’s standard library; optional language-model backends can extend interpretation.</p>
+      <p>NLCL is an independent project shared to invite research feedback. It is not affiliated with or endorsed by Anthropic.</p>
+    </section>
+
+    <section class="cards" aria-label="Project links">
+      <article class="card">
+        <h2>Get started</h2>
+        <p>Install nothing extra to try the offline Python prototype.</p>
+        <a href="https://github.com/anonymous14725/nlcl#quick-start">Quick start →</a>
+      </article>
+      <article class="card">
+        <h2>Research proposal</h2>
+        <p>Read the concept, goals, and broader research motivation.</p>
+        <a href="https://github.com/anonymous14725/nlcl/blob/main/PROPOSAL.md">Open proposal →</a>
+      </article>
+      <article class="card">
+        <h2>See it in action</h2>
+        <p>Browse interface screenshots and example workflows.</p>
+        <a href="https://github.com/anonymous14725/nlcl#screenshots">View screenshots →</a>
+      </article>
+    </section>
+  </main>
+  <footer><div class="wrap">Open source under the MIT License · <a href="https://github.com/anonymous14725/nlcl">GitHub repository</a></div></footer>
+</body>
+</html>
